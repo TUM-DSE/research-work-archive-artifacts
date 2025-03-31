@@ -64,6 +64,7 @@ If you are unsure, please consult with your advisor.
 ## Licencing and attribution
 
 If the repository you are trying to copy does not already contain a licence notice, we ask you to add a licence and attribution since this repository is public.
-We ask that you choose an __open source__ licence (e.g. MIT, GPLv2, Apache). You can find a list of suitable licences with the required text [here](https://opensource.org/licenses).
+We ask that you choose an __open source__ licence (e.g. [MIT](https://opensource.org/license/mit), [GPLv2](https://opensource.org/license/gpl-2-0), [Apachev2](https://opensource.org/license/apache-2-0)).
+You can find a list of suitable licences with the required text [here](https://opensource.org/licenses).
 
 To add the licence, simply copy the text of the licence into a LICENCE file in your folder. Do not forget to attribute it to you if required by the licence.
