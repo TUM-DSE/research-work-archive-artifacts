@@ -19,7 +19,7 @@ For the artifacts, we follow the same naming convention and folders hierarchy, p
 
 The folder with your artifact should be named: 
 ```
-<type>_<lastname>.pdf
+<type>_<lastname>/
 ```
 
 where
