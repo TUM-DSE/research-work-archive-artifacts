@@ -9,6 +9,7 @@ website](https://dse.in.tum.de/thesis/).
 
 
 Archives:
+- [2024](./archive/2024/README.md)
 - [2025](./archive/2025/README.md)
 
 ## Uploading your artifacts to this repository
