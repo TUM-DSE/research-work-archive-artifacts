@@ -1,0 +1,64 @@
+# Common flags for both variants
+common_flags := "-O2 -Wall -Wpedantic -Wextra"
+
+# Specific flags for each variant
+purecap_flags := "--target=aarch64-unknown-linux-musl_purecap -mabi=purecap -march=morello -fuse-ld=lld -nostdinc --sysroot $MUSL_PATH/ -isystem $MUSL_PATH/include -L$MUSL_PATH/lib -static -I\"$LLVM_PATH/lib/clang/14.0.0/include\""
+nocap_flags := ""
+hybrid_flags := "-march=morello -Wcheri"
+
+run_all:
+    just run_instructions
+    just run_memory_latency
+    just run_applications
+
+clean_all:
+    just clean_instructions
+    just clean_memory_latency
+    just clean_applications
+
+plot_applications:
+    just applications/polybench/plot
+
+run_applications:
+    just applications/polybench/run
+
+build_applications:
+    just applications/polybench/build
+
+clean_applications:
+    just applications/polybench/clean
+
+[working-directory : './instructions/output']
+run_instructions: build_instructions
+    python3 ../instructions.py
+
+[working-directory : './instructions']
+build_instructions: clean_instructions
+    $CLANG_PURECAP_PATH {{common_flags}} {{purecap_flags}} ./instructions_purecap.c ./instructions_purecap.s -o ./output/instructions_purecap.out
+    env -i $CLANG_HYBRID_PATH {{common_flags}} {{nocap_flags}} ./instructions_nocap.c ./instructions_nocap.s -o ./output/instructions_nocap.out
+
+[working-directory : './instructions']
+clean_instructions:
+    rm -rf ./output
+    mkdir ./output
+
+[working-directory : './memory_latency/output']
+plot_memory_latency:
+    python3 ../memory_latency_plot.py
+
+[working-directory : './memory_latency/output']
+run_memory_latency: build_memory_latency
+    ./memory_latency_nocap.out > memory_latency_nocap.csv
+    ./memory_latency_hybrid.out > memory_latency_hybrid.csv
+    ./memory_latency_purecap.out > memory_latency_purecap.csv
+
+[working-directory : './memory_latency']
+build_memory_latency: clean_memory_latency
+    env -i $CLANG_HYBRID_PATH {{common_flags}} {{nocap_flags}} ./memory_latency.c -o ./output/memory_latency_nocap.out
+    env -i $CLANG_HYBRID_PATH {{common_flags}} {{hybrid_flags}} ./memory_latency_hybrid.c -o ./output/memory_latency_hybrid.out
+    $CLANG_PURECAP_PATH {{common_flags}} {{purecap_flags}} ./memory_latency.c -o ./output/memory_latency_purecap.out
+
+[working-directory : './memory_latency']
+clean_memory_latency:
+    rm -rf ./output
+    mkdir ./output

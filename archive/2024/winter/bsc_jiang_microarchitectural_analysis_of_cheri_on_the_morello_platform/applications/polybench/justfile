@@ -1,0 +1,30 @@
+# Common flags for both variants
+common_flags := "-O2 -lm"
+
+# Specific flags for each variant
+purecap_flags := "--target=aarch64-unknown-linux-musl_purecap -mabi=purecap -march=morello -fuse-ld=lld -nostdinc --sysroot $MUSL_PATH/ -isystem $MUSL_PATH/include -L$MUSL_PATH/lib -static -I\"$LLVM_PATH/lib/clang/14.0.0/include\""
+nocap_flags := ""
+hybrid_flags := "-march=morello -Wcheri"
+
+bench_flag := "-DPOLYBENCH_TIME"
+
+plot:
+    python ./polybench_plot.py ./output/polybench.csv
+
+run: build
+    python ./polybench.py > ./output/polybench.csv
+
+build: clean
+    #!/usr/bin/env bash
+    while read -r bench_path; do
+        just build_bench $bench_path
+    done < "utilities/benchmark_list"
+
+
+build_bench bench_path:
+    env -i $CLANG_HYBRID_PATH {{common_flags}} {{nocap_flags}} -I utilities -I {{parent_dir(bench_path)}} utilities/polybench.c {{bench_path}}  {{bench_flag}} -o ./output/{{file_stem(bench_path)}}_nocap
+    $CLANG_PURECAP_PATH {{common_flags}} {{purecap_flags}} -I utilities -I {{parent_dir(bench_path)}} utilities/polybench.c {{bench_path}}  {{bench_flag}} -o ./output/{{file_stem(bench_path)}}_purecap
+
+clean:
+    rm -rf ./output
+    mkdir ./output
