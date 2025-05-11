@@ -24,12 +24,23 @@ To run the experiments on a remote machine, valid SSH keys must be established. 
 
 From the root directory of the repo, run any benchmark with the following command:
 ```bash
-./scripts/main.py --experiment <experiment> remote --remote-user <ssh-user> --remote-host <ssh-host>
+./scripts/main.py \
+  --experiment <experiment> \
+  remote \
+  --remote-user <ssh-user> \
+  --remote-host <ssh-host> \
 ```
 
 If an SSH jump host is needed, use the following command:
 ```bash
-./scripts/main.py --experiment <experiment> remote --remote-user <ssh-user> --remote-host <ssh-host> --remote-jump-user <ssh-jump-user> --remote-jump-host <ssh-jump-host> --remote-jump-port <ssh-jump-port>
+./scripts/main.py \
+  --experiment <experiment> \
+  remote \
+  --remote-user <ssh-user> \
+  --remote-host <ssh-host> \
+  --remote-jump-user <ssh-jump-user> \
+  --remote-jump-host <ssh-jump-host> \
+  --remote-jump-port <ssh-jump-port>
 ```
 
 ### Additional Information
