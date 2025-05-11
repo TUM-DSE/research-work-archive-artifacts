@@ -45,18 +45,18 @@ If an SSH jump host is needed, use the following command:
 
 ### Additional Information
 
-- By default, experiments are extracted from `/experiments/`. If your experiment is located in another directory, specify the base directory with `--base`.
-- By default, all results of the experiments are placed into `/results`. To change this behavior, specify `--result`.
+- By default, experiments are extracted from `./experiments`. If your experiment is located in another directory, specify the base directory with `--base`.
+- By default, all results of the experiments are placed into `./results`. To change this behavior, specify `--result`.
 - When an experiment is executed, a context on the machine is created. This context is a temporary directory on the system. By default, after the execution of the benchmark, this directory is not cleaned up. To enable cleanup, specify `--cleanup`.
 
 ## Structure
 
 The structure of the experiment follows this pattern:
 
-- Experiments are placed inside the `--base` directory (default: `/experiments/`) and are referred to by the name of the experiment. For example, if we have an experiment named `my-experiment`, a directory inside `/experiments/my-experiment/` must exist.
+- Experiments are placed inside the `--base` directory (default: `./experiments`) and are referred to by the name of the experiment. For example, if we have an experiment named `my-experiment`, a directory inside `./experiments/my-experiment` must exist.
 - On execution of an experiment, the `--base` directory is synced to the context of the current run, then:
   - We run the Makefile inside this folder. This Makefile performs all steps required to run the experiment (like compiling and executing the actual experiment).
-  - The results produced by the experiment are placed into `/experiments/my-experiment/results/`. These results are then synced back to the results `--result` directory (default `/results/my-experiment/`).
+  - The results produced by the experiment are placed into `./experiments/my-experiment/results`. These results are then synced back to the results `--result` directory (default `./results/my-experiment`).
   - The results are processed.
 
 ## Adding Additional Experiments
