@@ -1,6 +1,6 @@
 # Memory Tagging Extension
 
-This tool and benchmark are designed to evaluate the performance overhead introduced with the usage of MTE.
+This tool and benchmark are designed to evaluate the performance overhead introduced with the usage of [MTE](https://developer.arm.com/documentation/108035/0100/Introduction-to-the-Memory-Tagging-Extension).
 
 ## Usage
 
