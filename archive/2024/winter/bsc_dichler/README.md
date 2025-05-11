@@ -28,7 +28,7 @@ From the root directory of the repo, run any benchmark with the following comman
   --experiment <experiment> \
   remote \
   --remote-user <ssh-user> \
-  --remote-host <ssh-host> \
+  --remote-host <ssh-host>
 ```
 
 If an SSH jump host is needed, use the following command:
@@ -55,8 +55,8 @@ The structure of the experiment follows this pattern:
 
 - Experiments are placed inside the `--base` directory (default: `/experiments/`) and are referred to by the name of the experiment. For example, if we have an experiment named `my-experiment`, a directory inside `/experiments/my-experiment/` must exist.
 - On execution of an experiment, the `--base` directory is synced to the context of the current run, then:
-  - We run the Makefile inside this folder. This Makefile must perform all steps required to run the experiment (like compiling and executing the actual experiment).
-  - The results produced by the experiment are placed into `/experiments/my-experiment/results/`. These results are then synced back to the results directory specified (`/results/my-experiment/`).
+  - We run the Makefile inside this folder. This Makefile performs all steps required to run the experiment (like compiling and executing the actual experiment).
+  - The results produced by the experiment are placed into `/experiments/my-experiment/results/`. These results are then synced back to the results `--result` directory (default `/results/my-experiment/`).
   - The results are processed.
 
 ## Adding Additional Experiments
