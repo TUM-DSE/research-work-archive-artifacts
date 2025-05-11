@@ -61,23 +61,13 @@ The structure of the experiment follows this pattern:
 
 ## Adding Additional Experiments
 
-To add a custom experiment called `my-experiment`, follow these steps. Assume that the standard `--base` directory (`/experiments/`) is used.
+To add a custom experiment called `my-experiment`, run the following command:
 
-1. Create a new directory:
-   ```bash
-   cd <root-of-repo>/experiments/
-   mkdir my-experiment
-   ```
-   
-2. Add a Makefile inside the directory (this will be called to perform any necessary work). For example, use `make` to compile and run your experiment.
+```bash
+./scripts/main.py create --name my-experiment
+```
 
-3. Add a Python script to evaluate the results of the benchmark.
+This command sets up the necessary structure and adds the appropriate files required to run the experiment.
+- Modify the Makefile at `./experiments/my-experiment/Makefile` to compile and execute your experiment as needed.
+- Adjust the evaluation script located at `./scripts/plot/my-experiment.py`, which will be executed after the benchmark completes and the results have been copied.
 
-4. Add the name of your experiment to the literals specified in this file:
-   ```python
-   Experiments = Literal[ ... "my-experiment" ]
-   ```
-   
-5. To add your analysis step, include `"my-experiment"` in the relevant section. How you evaluate the results is up to you, but you must add a function call to the `experiments` dictionary.
-
-Now you can run your experiment!

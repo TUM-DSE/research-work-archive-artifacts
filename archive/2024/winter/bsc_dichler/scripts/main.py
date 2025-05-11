@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python
 
 import argparse
 import asyncio
@@ -19,7 +19,6 @@ async def run(
     experiment: experiments.Experiments,
 ) -> None:
     info(str(ctx))
-    """
     async with ctx as client:
         info(f"Open new context ({client.context()})")
 
@@ -36,7 +35,6 @@ async def run(
         )
 
     info("Done running experiments")
-    """
 
     info("Start plotting measurements")
     experiments.plot(local_result_path, experiment, format="pdf")
@@ -115,6 +113,35 @@ def run_remote(args):
     )
 
 
+def run_create(args):
+    experiment = args.name
+    experiment_base = Path(args.base)
+    experiment_root = experiment_base / Path(experiment)
+    if experiment_root.exists():
+        error(f"Experiment with name '{experiment}' already exists")
+        sys.exit(1)
+
+    evaluation_script = Path(__file__).parent / Path("plot") / Path(f"{experiment}.py")
+    if evaluation_script.exists():
+        error(f"Experiment with name '{experiment}' already exists")
+        sys.exit(1)
+
+    experiment_root.mkdir(parents=True, exist_ok=True)
+    makefile = experiment_root / Path("Makefile")
+    makefile.write_text(("default:\n" "\techo Hello World\n"))
+
+    evaluation_script = Path(__file__).parent / Path("plot") / Path(f"{experiment}.py")
+    evaluation_script.write_text(
+        (
+            "from pathlib import Path\n\n"
+            "def plot(output_root: Path, format):\n"
+            "\tpass\n"
+        )
+    )
+
+    experiments.verify_experiment(experiment_base, experiment)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="benchmark-tool",
@@ -129,35 +156,50 @@ if __name__ == "__main__":
         help="The base directory in which the experiments are implemented.",
     )
 
-    result_root = Path(__file__).parent.parent / Path("results/")
-    _ = parser.add_argument(
-        "--result",
-        default=str(result_root),
-        type=str,
-        help="The base directory in which all the results are placed.",
-    )
+    args, _ = parser.parse_known_args()
+    discovered_experiments = experiments.discover_experiments(Path(args.base))
+    choices = list(discovered_experiments.keys())
+    experiments.set_experiments(discovered_experiments)
 
-    _ = parser.add_argument(
-        "--experiment",
-        type=str,
-        choices=experiments.experiment_choices(),
-        required=True,
-        help="The experiment to run",
-    )
+    def add_argument(p):
+        result_root = Path(__file__).parent.parent / Path("results/")
+        _ = p.add_argument(
+            "--result",
+            default=str(result_root),
+            type=str,
+            help="The base directory in which all the results are placed.",
+        )
 
-    _ = parser.add_argument(
-        "--cleanup",
-        action="store_true",
-        help="Cleanup all the resources of the context",
-    )
+        _ = p.add_argument(
+            "--cleanup",
+            action="store_true",
+            help="Cleanup all the resources of the context",
+        )
+        _ = p.add_argument(
+            "--experiment",
+            type=str,
+            choices=choices,
+            required=True,
+            help="The experiment to run",
+        )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
+    create = subparsers.add_parser("create", help="Run the experiment locally.")
+    create.add_argument(
+        "--name",
+        type=str,
+        required=True,
+        help="The name of the new experiment",
+    )
+    create.set_defaults(func=run_create)
 
     local = subparsers.add_parser("local", help="Run the experiment locally.")
     local.set_defaults(func=run_local)
+    add_argument(local)
 
     remote = subparsers.add_parser("remote", help="Run the experiment remotely")
     remote.set_defaults(func=run_remote)
+    add_argument(remote)
 
     remote.add_argument(
         "--remote-user", help="Remote username (or set MTE_REMOTE_USER)"

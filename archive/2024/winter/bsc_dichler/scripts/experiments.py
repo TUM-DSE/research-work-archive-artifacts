@@ -3,12 +3,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from plot import parallel_non_contiguous
-from plot import cas
-from plot import non_contiguous
-from plot import contiguous
-from plot import malloc
-from plot import contiguous_tagging
+import importlib
+import importlib.util
 
 Experiments = Literal[
     "cas",
@@ -19,22 +15,16 @@ Experiments = Literal[
     "parallel_non_contiguous",
 ]
 PlottingFunction = Callable[[Path, str], None]
-
-experiments: dict[str, PlottingFunction] = {
-    "cas": lambda r, t: cas.plot(r, t),
-    "contiguous": lambda r, t: contiguous.plot(r, t),
-    "non_contiguous": lambda r, t: non_contiguous.plot(r, t),
-    "contiguous_tagging": lambda r, t: contiguous_tagging.plot(r, t),
-    "malloc": lambda r, t: malloc.plot(r, t),
-    "parallel_non_contiguous": lambda r, t: parallel_non_contiguous.plot(r, t),
-}
+experiments: dict[str, PlottingFunction] | None = None
 
 
-def experiment_choices() -> list[str]:
-    return list(experiments.keys())
+def set_experiments(discovered_experiments: dict[str, PlottingFunction]):
+    global experiments
+    experiments = discovered_experiments
 
 
 def plot(output_root: Path, experiment: Experiments, format: Literal["pdf", "png"]):
+    assert experiment, "invalid state, experiment discovery was not executed"
     rcParams = {
         "font.family": "serif",
         "font.size": 11,
@@ -48,3 +38,47 @@ def plot(output_root: Path, experiment: Experiments, format: Literal["pdf", "png
 
     mpl.rcParams.update(rcParams)
     experiments[experiment](output_root, format)
+
+
+def verify_experiment(experiment_base: Path, experiment_name: str) -> None:
+    experiment_directory = experiment_base / Path(experiment_name)
+    if not experiment_directory.exists():
+        raise Exception(f"Invalid state - cannot find experiment '{experiment_name}'.")
+
+    makefile = experiment_directory / Path("Makefile")
+    if not makefile.exists():
+        raise Exception(
+            f"Invalid state - cannot find Makefile for '{experiment_name}'."
+        )
+
+    evaluation_script = (
+        Path(__file__).parent / Path("plot") / Path(f"{experiment_name}.py")
+    )
+    if not evaluation_script.exists():
+        raise Exception(
+            f"Invalid state - cannot find evaluation script for '{experiment_name}'."
+        )
+
+
+def discover_experiments(base: Path):
+    experiments = {}
+
+    evaluation_script = Path(__file__).parent / Path("plot")
+    for file in evaluation_script.glob("*.py"):
+        if file.name == "__init__.py":
+            continue
+        module_name = file.stem
+        spec = importlib.util.spec_from_file_location(module_name, file)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        if hasattr(module, "plot"):
+            experiments[module_name] = module.plot
+        else:
+            print("foo")
+
+    experiment_source = set()
+    for experiment in base.iterdir():
+        if experiment.is_dir():
+            experiment_source.add(experiment.name)
+
+    return {k: v for k, v in experiments.items() if k in experiment_source}
