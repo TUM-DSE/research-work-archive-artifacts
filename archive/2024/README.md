@@ -10,3 +10,4 @@
 
 | Student                           | Title                                                                                     | Type | Advisors                                 | Artifacts                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------- | ---- | ---------------------------------------- | ------------------------------------------------------------- |
+| Raphael Dichler               | Evaluation of the Performance of the Memory Tagging Extensions | BA   | Martin Fink, Meignan--Masson                             |   [Source](/archive/2024/winter/bsc_dichler)                             |
