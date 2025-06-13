@@ -1,0 +1,3 @@
+N_THREADS=8
+N_CPUS=8
+
