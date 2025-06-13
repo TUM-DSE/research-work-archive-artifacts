@@ -1,0 +1,9 @@
+Tokens generated: 47157
+Time spent: 616.93
+Throughput (t/s): 76.4382
+Time spent on context creation: 1104ms
+Number of context creations: 119
+Average context creation time: 9ms
+Time spent on context switches: 8042ms
+Number of context switches: 868
+Average context switch time: 9ms

@@ -1,0 +1,6 @@
+[submodule "tensorflow-llm-os"]
+	path = tensorflow-llm-os
+	url = git@github.com:TUM-DSE/tensorflow-llm-os.git
+[submodule "llama.cpp"]
+	path = llama.cpp
+	url = git@github.com:TUM-DSE/llama.cpp.git
