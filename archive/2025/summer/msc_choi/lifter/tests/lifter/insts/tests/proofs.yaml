@@ -1,0 +1,1223 @@
+tests:
+- name: proofs_1
+  bytes: [0x40, 0x44, 0x40, 0xf8]
+  proofs: [0x00, 0x05, 0x40, 0x08, 0x82, 0x80, 0x80, 0x80, 0x30, 0x40, 0x08, 0x80,
+           0x80, 0x80, 0x80, 0x30, 0x40, 0x01, 0x02, 0x01, 0x2a, 0x01, 0x02, 0x00,
+           0x02, 0x01, 0x05, 0x00, 0x01, 0x02, 0x01, 0x00, 0x02, 0x00, 0x03, 0x01,
+           0x04]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i64.unsigned_from_bits v0
+      nextln:   v2 = int.modulo v1, 0x8
+      nextln:   v3 = int.sub v1, v2
+      nextln:   v4 = i64.to_bits v3
+      nextln:   v5 = bool.icmp.i64.eq v0, v4
+      nextln:   v6 = bool.bitwise_not v5
+      nextln:   v7 = bool.bitwise_not v5
+      nextln:   jumpif v7, addr_0_block_0, addr_0_block_276
+      check: addr_0_block_0: // preds: entry
+      nextln:   v8 = i64.unsigned_from_bits v0
+      nextln:   v9 = int.modulo v8, 0x1
+      nextln:   v10 = int.sub v8, v9
+      nextln:   v11 = i64.to_bits v10
+      nextln:   v12 = bool.icmp.i64.eq v0, v11
+      nextln:   v13 = i64.lshr v0, 0x30
+      nextln:   v14 = i16.trunc.i64 v13
+      nextln:   v15 = bool.icmp.i16.eq v14, 0x0
+      nextln:   v16 = bool.bitwise_not v15
+      nextln:   jumpif v16, addr_0_block_1, addr_0_block_2
+      nextln:   jump addr_0_block_311(v177, v178, v1276)
+      check: addr_0_block_1: // no preds!
+      nextln:   jump addr_0_block_3(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_4(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_2: // no preds!
+      nextln:   jump addr_0_block_3(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_3(v1312: i52, v1313: int, v1314: bool, v1315: bool): // preds: addr_0_block_2
+      nextln:   v1316 = i52.trunc.i64 v0
+      nextln:   jump addr_0_block_4(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1316, 0x1, 0x0)
+      check: addr_0_block_4(v30: i3, v31: i1, v32: i1, v33: i1, v34: i1, v35: i4, v36: i1, v37: bool, v38: int, v39: int, v40: bool, v41: bool, v42: i8, v43: i8, v44: i52, v45: i1, v46: bool, v47: bool, v48: int, v49: i1, v50: bool, v51: i4, v52: i2, v53: i4, v54: i8, v55: i8, v56: i2, v57: i2, v58: bool, v59: i2, v60: i2, v61: bool, v62: bool, v63: bool, v64: bool, v65: i52, v66: i1, v67: i64, v68: i1, v69: i8, v70: i8, v71: i52, v72: i1, v73: bool, v74: bool, v75: int, v76: i1, v77: bool, v78: i4, v79: i2, v80: i4, v81: i8, v82: i8, v83: i2, v84: i2, v85: bool, v86: i2, v87: i2, v88: bool, v89: bool, v90: bool, v91: bool, v92: i52, v93: i1, v94: i64): // preds: addr_0_block_1 addr_0_block_3
+      nextln:   v95 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v96 = bool.bitwise_not v95
+      nextln:   v97 = bool.bitwise_not v5
+      nextln:   v98 = bool.and v97, 0x1
+      nextln:   v99 = bool.or v98, 0x0
+      nextln:   v100 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v101 = bool.bitwise_not v100
+      nextln:   v102 = bool.and v99, v101
+      nextln:   v103 = bool.icmp.i8.eq v81, 0x1
+      nextln:   v104 = bool.and v102, v103
+      nextln:   jumpif v104, addr_0_block_5, addr_0_block_6
+      check: addr_0_block_5: // preds: addr_0_block_4
+      nextln:   jump addr_0_block_7
+      check: addr_0_block_6: // preds: addr_0_block_4
+      nextln:   jump addr_0_block_7
+      check: addr_0_block_7: // preds: addr_0_block_5 addr_0_block_6
+      nextln:   v105 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v106 = bool.bitwise_not v105
+      nextln:   v107 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v108 = bool.bitwise_not v107
+      nextln:   v109 = bool.icmp.i8.eq v81, 0x1
+      nextln:   v110 = bool.and v108, v109
+      nextln:   jumpif v40, addr_0_block_8, addr_0_block_9
+      check: addr_0_block_8: // preds: addr_0_block_7
+      nextln:   v111 = bool.icmp.i8.eq v69, 0x0
+      nextln:   jump addr_0_block_10(0x1)
+      check: addr_0_block_9: // preds: addr_0_block_7
+      nextln:   jump addr_0_block_10(0x0)
+      check: addr_0_block_10(v112: bool): // preds: addr_0_block_8 addr_0_block_9
+      nextln:   v113 = bool.icmp.i8.eq v69, 0x0
+      nextln:   v114 = bool.and v41, v113
+      nextln:   jumpif v114, addr_0_block_11, addr_0_block_12
+      check: addr_0_block_11: // preds: addr_0_block_10
+      nextln:   jump addr_0_block_13(0x0, 0x0)
+      check: addr_0_block_12: // preds: addr_0_block_10
+      nextln:   jump addr_0_block_13(0x0, 0x0)
+      check: addr_0_block_13(v115: bool, v116: bool): // preds: addr_0_block_11 addr_0_block_12
+      nextln:   v117 = bool.or v112, v115
+      nextln:   jumpif v117, addr_0_block_14, addr_0_block_27
+      check: addr_0_block_14: // preds: addr_0_block_13
+      nextln:   v118 = i52.unsigned_from_bits v65
+      nextln:   v119 = int.modulo v118, 0x8
+      nextln:   v120 = int.sub v118, v119
+      nextln:   v121 = i52.to_bits v120
+      nextln:   v122 = bool.icmp.i52.eq v65, v121
+      nextln:   v123 = i64.load v65
+      nextln:   jumpif v112, addr_0_block_15, addr_0_block_16
+      nextln:   jump addr_0_block_28(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v123, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52, v53, v54, v55, v56, v57, v58, v59, v60, v61, v62, v63, v64, v65, v66, v67, 0x0, 0x0)
+      check: addr_0_block_15: // no preds!
+      nextln:   jump addr_0_block_17
+      check: addr_0_block_16: // no preds!
+      nextln:   jump addr_0_block_17
+      check: addr_0_block_17: // preds: addr_0_block_15 addr_0_block_16
+      nextln:   jumpif v115, addr_0_block_18, addr_0_block_19
+      check: addr_0_block_18: // preds: addr_0_block_17
+      nextln:   jump addr_0_block_20
+      check: addr_0_block_19: // preds: addr_0_block_17
+      nextln:   jump addr_0_block_20
+      check: addr_0_block_20: // preds: addr_0_block_18 addr_0_block_19
+      nextln:   v1317 = i52.unsigned_from_bits v65
+      nextln:   v1318 = int.modulo v1317, 0x8
+      nextln:   v1319 = int.sub v1317, v1318
+      nextln:   v1320 = i52.to_bits v1319
+      nextln:   v1321 = bool.icmp.i52.eq v65, v1320
+      nextln:   v1322 = bool.icmp.i52.eq v65, 0x13000000
+      nextln:   jumpif v1322, addr_0_block_21, addr_0_block_25
+      check: addr_0_block_21: // preds: addr_0_block_20
+      nextln:   v1323 = i64.unsigned_from_bits v123
+      nextln:   v1324 = bool.icmp.int.eq v1323, 0x4
+      nextln:   jumpif v1324, addr_0_block_22, addr_0_block_23
+      nextln:   jump addr_0_block_26
+      check: addr_0_block_22: // no preds!
+      nextln:   jump addr_0_block_24
+      check: addr_0_block_23: // no preds!
+      nextln:   v1325 = i8.trunc.i64 v123
+      nextln:   v1326 = i8.unsigned_from_bits v1325
+      nextln:   jump addr_0_block_24
+      check: addr_0_block_24: // preds: addr_0_block_22 addr_0_block_23
+      check: addr_0_block_25: // preds: addr_0_block_20
+      nextln:   store.i64 v123, v65
+      nextln:   jump addr_0_block_26
+      check: addr_0_block_26: // preds: addr_0_block_21 addr_0_block_25
+      check: addr_0_block_27: // preds: addr_0_block_13
+      nextln:   jump addr_0_block_28(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_28(v124: i8, v125: i1, v126: i16, v127: i8, v128: bool, v129: bool, v130: bool, v131: int, v132: i64, v133: i8, v134: i8, v135: i52, v136: i1, v137: bool, v138: bool, v139: int, v140: i1, v141: bool, v142: i4, v143: i2, v144: i4, v145: i8, v146: i8, v147: i2, v148: i2, v149: bool, v150: i2, v151: i2, v152: bool, v153: bool, v154: bool, v155: bool, v156: i52, v157: i1, v158: i64, v159: i2, v160: bool): // preds: addr_0_block_14 addr_0_block_27
+      nextln:   v161 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v162 = bool.bitwise_not v161
+      nextln:   v163 = bool.and v162, 0x1
+      nextln:   v164 = bool.icmp.i8.ne v69, 0x0
+      nextln:   v165 = bool.bitwise_not v164
+      nextln:   v166 = bool.and 0x1, v165
+      nextln:   jumpif v166, addr_0_block_29, addr_0_block_30
+      check: addr_0_block_29: // preds: addr_0_block_28
+      nextln:   jump addr_0_block_31
+      check: addr_0_block_30: // preds: addr_0_block_28
+      nextln:   jump addr_0_block_31
+      check: addr_0_block_31: // preds: addr_0_block_29 addr_0_block_30
+      nextln:   v167 = bool.icmp.i8.ne v69, 0x0
+      nextln:   jumpif v167, addr_0_block_32, addr_0_block_33
+      check: addr_0_block_32: // preds: addr_0_block_31
+      nextln:   jump addr_0_block_34
+      check: addr_0_block_33: // preds: addr_0_block_31
+      nextln:   jump addr_0_block_34
+      check: addr_0_block_34: // preds: addr_0_block_32 addr_0_block_33
+      nextln:   v168 = i52.unsigned_from_bits v92
+      nextln:   v169 = int.modulo v168, 0x1
+      nextln:   v170 = int.sub v168, v169
+      nextln:   v171 = i52.to_bits v170
+      nextln:   v172 = bool.icmp.i52.eq v92, v171
+      nextln:   v173 = i8.load v92
+      nextln:   v174 = i8.lshl v173, 0x0
+      nextln:   v175 = i64.or 0x0, v174
+      nextln:   v176 = bool.bitwise_not v5
+      nextln:   jumpif v176, addr_0_block_35, addr_0_block_36
+      check: addr_0_block_35: // preds: addr_0_block_34
+      nextln:   jump addr_0_block_37(v5, 0xc)
+      check: addr_0_block_36: // preds: addr_0_block_34
+      nextln:   jump addr_0_block_37(v5, 0x0)
+      check: addr_0_block_37(v177: i64, v178: i8): // preds: addr_0_block_35 addr_0_block_36
+      nextln:   v179 = i64.wrapping_add v0, 0x1
+      nextln:   v180 = i64.unsigned_from_bits v179
+      nextln:   v181 = int.modulo v180, 0x1
+      nextln:   v182 = int.sub v180, v181
+      nextln:   v183 = i64.to_bits v182
+      nextln:   v184 = bool.icmp.i64.eq v179, v183
+      nextln:   v185 = i64.lshr v179, 0x30
+      nextln:   v186 = i16.trunc.i64 v185
+      nextln:   v187 = bool.icmp.i16.eq v186, 0x0
+      nextln:   v188 = bool.bitwise_not v187
+      nextln:   jumpif v188, addr_0_block_38, addr_0_block_39
+      check: addr_0_block_38: // preds: addr_0_block_37
+      nextln:   jump addr_0_block_40(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_41(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_39: // preds: addr_0_block_37
+      nextln:   jump addr_0_block_40(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_40(v1307: i52, v1308: int, v1309: bool, v1310: bool): // preds: addr_0_block_39
+      nextln:   v1311 = i52.trunc.i64 v179
+      nextln:   jump addr_0_block_41(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1311, 0x1, 0x0)
+      check: addr_0_block_41(v189: i3, v190: i1, v191: i1, v192: i1, v193: i1, v194: i4, v195: i1, v196: bool, v197: int, v198: int, v199: bool, v200: bool, v201: i8, v202: i8, v203: i52, v204: i1, v205: bool, v206: bool, v207: int, v208: i1, v209: bool, v210: i4, v211: i2, v212: i4, v213: i8, v214: i8, v215: i2, v216: i2, v217: bool, v218: i2, v219: i2, v220: bool, v221: bool, v222: bool, v223: bool, v224: i52, v225: i1, v226: i64, v227: i1, v228: i8, v229: i8, v230: i52, v231: i1, v232: bool, v233: bool, v234: int, v235: i1, v236: bool, v237: i4, v238: i2, v239: i4, v240: i8, v241: i8, v242: i2, v243: i2, v244: bool, v245: i2, v246: i2, v247: bool, v248: bool, v249: bool, v250: bool, v251: i52, v252: i1, v253: i64): // preds: addr_0_block_38 addr_0_block_40
+      nextln:   v254 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v255 = bool.bitwise_not v254
+      nextln:   v256 = bool.bitwise_not v5
+      nextln:   v257 = bool.and v256, 0x1
+      nextln:   v258 = bool.or v257, 0x0
+      nextln:   v259 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v260 = bool.bitwise_not v259
+      nextln:   v261 = bool.and v258, v260
+      nextln:   v262 = bool.icmp.i8.eq v240, 0x1
+      nextln:   v263 = bool.and v261, v262
+      nextln:   jumpif v263, addr_0_block_42, addr_0_block_43
+      check: addr_0_block_42: // preds: addr_0_block_41
+      nextln:   jump addr_0_block_44
+      check: addr_0_block_43: // preds: addr_0_block_41
+      nextln:   jump addr_0_block_44
+      check: addr_0_block_44: // preds: addr_0_block_42 addr_0_block_43
+      nextln:   v264 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v265 = bool.bitwise_not v264
+      nextln:   v266 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v267 = bool.bitwise_not v266
+      nextln:   v268 = bool.icmp.i8.eq v240, 0x1
+      nextln:   v269 = bool.and v267, v268
+      nextln:   jumpif v199, addr_0_block_45, addr_0_block_46
+      check: addr_0_block_45: // preds: addr_0_block_44
+      nextln:   v270 = bool.icmp.i8.eq v228, 0x0
+      nextln:   jump addr_0_block_47(0x1)
+      check: addr_0_block_46: // preds: addr_0_block_44
+      nextln:   jump addr_0_block_47(0x0)
+      check: addr_0_block_47(v271: bool): // preds: addr_0_block_45 addr_0_block_46
+      nextln:   v272 = bool.icmp.i8.eq v228, 0x0
+      nextln:   v273 = bool.and v200, v272
+      nextln:   jumpif v273, addr_0_block_48, addr_0_block_49
+      check: addr_0_block_48: // preds: addr_0_block_47
+      nextln:   jump addr_0_block_50(0x0, 0x0)
+      check: addr_0_block_49: // preds: addr_0_block_47
+      nextln:   jump addr_0_block_50(0x0, 0x0)
+      check: addr_0_block_50(v274: bool, v275: bool): // preds: addr_0_block_48 addr_0_block_49
+      nextln:   v276 = bool.or v271, v274
+      nextln:   jumpif v276, addr_0_block_51, addr_0_block_64
+      check: addr_0_block_51: // preds: addr_0_block_50
+      nextln:   v277 = i52.unsigned_from_bits v224
+      nextln:   v278 = int.modulo v277, 0x8
+      nextln:   v279 = int.sub v277, v278
+      nextln:   v280 = i52.to_bits v279
+      nextln:   v281 = bool.icmp.i52.eq v224, v280
+      nextln:   v282 = i64.load v224
+      nextln:   jumpif v271, addr_0_block_52, addr_0_block_53
+      nextln:   jump addr_0_block_65(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v282, v201, v202, v203, v204, v205, v206, v207, v208, v209, v210, v211, v212, v213, v214, v215, v216, v217, v218, v219, v220, v221, v222, v223, v224, v225, v226, 0x0, 0x0)
+      check: addr_0_block_52: // no preds!
+      nextln:   jump addr_0_block_54
+      check: addr_0_block_53: // no preds!
+      nextln:   jump addr_0_block_54
+      check: addr_0_block_54: // preds: addr_0_block_52 addr_0_block_53
+      nextln:   jumpif v274, addr_0_block_55, addr_0_block_56
+      check: addr_0_block_55: // preds: addr_0_block_54
+      nextln:   jump addr_0_block_57
+      check: addr_0_block_56: // preds: addr_0_block_54
+      nextln:   jump addr_0_block_57
+      check: addr_0_block_57: // preds: addr_0_block_55 addr_0_block_56
+      nextln:   v1327 = i52.unsigned_from_bits v224
+      nextln:   v1328 = int.modulo v1327, 0x8
+      nextln:   v1329 = int.sub v1327, v1328
+      nextln:   v1330 = i52.to_bits v1329
+      nextln:   v1331 = bool.icmp.i52.eq v224, v1330
+      nextln:   v1332 = bool.icmp.i52.eq v224, 0x13000000
+      nextln:   jumpif v1332, addr_0_block_58, addr_0_block_62
+      check: addr_0_block_58: // preds: addr_0_block_57
+      nextln:   v1333 = i64.unsigned_from_bits v282
+      nextln:   v1334 = bool.icmp.int.eq v1333, 0x4
+      nextln:   jumpif v1334, addr_0_block_59, addr_0_block_60
+      nextln:   jump addr_0_block_63
+      check: addr_0_block_59: // no preds!
+      nextln:   jump addr_0_block_61
+      check: addr_0_block_60: // no preds!
+      nextln:   v1335 = i8.trunc.i64 v282
+      nextln:   v1336 = i8.unsigned_from_bits v1335
+      nextln:   jump addr_0_block_61
+      check: addr_0_block_61: // preds: addr_0_block_59 addr_0_block_60
+      check: addr_0_block_62: // preds: addr_0_block_57
+      nextln:   store.i64 v282, v224
+      nextln:   jump addr_0_block_63
+      check: addr_0_block_63: // preds: addr_0_block_58 addr_0_block_62
+      check: addr_0_block_64: // preds: addr_0_block_50
+      nextln:   jump addr_0_block_65(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_65(v283: i8, v284: i1, v285: i16, v286: i8, v287: bool, v288: bool, v289: bool, v290: int, v291: i64, v292: i8, v293: i8, v294: i52, v295: i1, v296: bool, v297: bool, v298: int, v299: i1, v300: bool, v301: i4, v302: i2, v303: i4, v304: i8, v305: i8, v306: i2, v307: i2, v308: bool, v309: i2, v310: i2, v311: bool, v312: bool, v313: bool, v314: bool, v315: i52, v316: i1, v317: i64, v318: i2, v319: bool): // preds: addr_0_block_51 addr_0_block_64
+      nextln:   v320 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v321 = bool.bitwise_not v320
+      nextln:   v322 = bool.and v321, 0x1
+      nextln:   v323 = bool.icmp.i8.ne v228, 0x0
+      nextln:   v324 = bool.bitwise_not v323
+      nextln:   v325 = bool.and 0x1, v324
+      nextln:   jumpif v325, addr_0_block_66, addr_0_block_67
+      check: addr_0_block_66: // preds: addr_0_block_65
+      nextln:   jump addr_0_block_68
+      check: addr_0_block_67: // preds: addr_0_block_65
+      nextln:   jump addr_0_block_68
+      check: addr_0_block_68: // preds: addr_0_block_66 addr_0_block_67
+      nextln:   v326 = bool.icmp.i8.ne v228, 0x0
+      nextln:   jumpif v326, addr_0_block_69, addr_0_block_70
+      check: addr_0_block_69: // preds: addr_0_block_68
+      nextln:   jump addr_0_block_71
+      check: addr_0_block_70: // preds: addr_0_block_68
+      nextln:   jump addr_0_block_71
+      check: addr_0_block_71: // preds: addr_0_block_69 addr_0_block_70
+      nextln:   v327 = i52.unsigned_from_bits v251
+      nextln:   v328 = int.modulo v327, 0x1
+      nextln:   v329 = int.sub v327, v328
+      nextln:   v330 = i52.to_bits v329
+      nextln:   v331 = bool.icmp.i52.eq v251, v330
+      nextln:   v332 = i8.load v251
+      nextln:   v333 = i8.lshl v332, 0x8
+      nextln:   v334 = i64.or 0x0, v333
+      nextln:   v335 = i64.wrapping_add v0, 0x2
+      nextln:   v336 = i64.unsigned_from_bits v335
+      nextln:   v337 = int.modulo v336, 0x1
+      nextln:   v338 = int.sub v336, v337
+      nextln:   v339 = i64.to_bits v338
+      nextln:   v340 = bool.icmp.i64.eq v335, v339
+      nextln:   v341 = i64.lshr v335, 0x30
+      nextln:   v342 = i16.trunc.i64 v341
+      nextln:   v343 = bool.icmp.i16.eq v342, 0x0
+      nextln:   v344 = bool.bitwise_not v343
+      nextln:   jumpif v344, addr_0_block_72, addr_0_block_73
+      check: addr_0_block_72: // preds: addr_0_block_71
+      nextln:   jump addr_0_block_74(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_75(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_73: // preds: addr_0_block_71
+      nextln:   jump addr_0_block_74(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_74(v1302: i52, v1303: int, v1304: bool, v1305: bool): // preds: addr_0_block_73
+      nextln:   v1306 = i52.trunc.i64 v335
+      nextln:   jump addr_0_block_75(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1306, 0x1, 0x0)
+      check: addr_0_block_75(v345: i3, v346: i1, v347: i1, v348: i1, v349: i1, v350: i4, v351: i1, v352: bool, v353: int, v354: int, v355: bool, v356: bool, v357: i8, v358: i8, v359: i52, v360: i1, v361: bool, v362: bool, v363: int, v364: i1, v365: bool, v366: i4, v367: i2, v368: i4, v369: i8, v370: i8, v371: i2, v372: i2, v373: bool, v374: i2, v375: i2, v376: bool, v377: bool, v378: bool, v379: bool, v380: i52, v381: i1, v382: i64, v383: i1, v384: i8, v385: i8, v386: i52, v387: i1, v388: bool, v389: bool, v390: int, v391: i1, v392: bool, v393: i4, v394: i2, v395: i4, v396: i8, v397: i8, v398: i2, v399: i2, v400: bool, v401: i2, v402: i2, v403: bool, v404: bool, v405: bool, v406: bool, v407: i52, v408: i1, v409: i64): // preds: addr_0_block_72 addr_0_block_74
+      nextln:   v410 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v411 = bool.bitwise_not v410
+      nextln:   v412 = bool.bitwise_not v5
+      nextln:   v413 = bool.and v412, 0x1
+      nextln:   v414 = bool.or v413, 0x0
+      nextln:   v415 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v416 = bool.bitwise_not v415
+      nextln:   v417 = bool.and v414, v416
+      nextln:   v418 = bool.icmp.i8.eq v396, 0x1
+      nextln:   v419 = bool.and v417, v418
+      nextln:   jumpif v419, addr_0_block_76, addr_0_block_77
+      check: addr_0_block_76: // preds: addr_0_block_75
+      nextln:   jump addr_0_block_78
+      check: addr_0_block_77: // preds: addr_0_block_75
+      nextln:   jump addr_0_block_78
+      check: addr_0_block_78: // preds: addr_0_block_76 addr_0_block_77
+      nextln:   v420 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v421 = bool.bitwise_not v420
+      nextln:   v422 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v423 = bool.bitwise_not v422
+      nextln:   v424 = bool.icmp.i8.eq v396, 0x1
+      nextln:   v425 = bool.and v423, v424
+      nextln:   jumpif v355, addr_0_block_79, addr_0_block_80
+      check: addr_0_block_79: // preds: addr_0_block_78
+      nextln:   v426 = bool.icmp.i8.eq v384, 0x0
+      nextln:   jump addr_0_block_81(0x1)
+      check: addr_0_block_80: // preds: addr_0_block_78
+      nextln:   jump addr_0_block_81(0x0)
+      check: addr_0_block_81(v427: bool): // preds: addr_0_block_79 addr_0_block_80
+      nextln:   v428 = bool.icmp.i8.eq v384, 0x0
+      nextln:   v429 = bool.and v356, v428
+      nextln:   jumpif v429, addr_0_block_82, addr_0_block_83
+      check: addr_0_block_82: // preds: addr_0_block_81
+      nextln:   jump addr_0_block_84(0x0, 0x0)
+      check: addr_0_block_83: // preds: addr_0_block_81
+      nextln:   jump addr_0_block_84(0x0, 0x0)
+      check: addr_0_block_84(v430: bool, v431: bool): // preds: addr_0_block_82 addr_0_block_83
+      nextln:   v432 = bool.or v427, v430
+      nextln:   jumpif v432, addr_0_block_85, addr_0_block_98
+      check: addr_0_block_85: // preds: addr_0_block_84
+      nextln:   v433 = i52.unsigned_from_bits v380
+      nextln:   v434 = int.modulo v433, 0x8
+      nextln:   v435 = int.sub v433, v434
+      nextln:   v436 = i52.to_bits v435
+      nextln:   v437 = bool.icmp.i52.eq v380, v436
+      nextln:   v438 = i64.load v380
+      nextln:   jumpif v427, addr_0_block_86, addr_0_block_87
+      nextln:   jump addr_0_block_99(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v438, v357, v358, v359, v360, v361, v362, v363, v364, v365, v366, v367, v368, v369, v370, v371, v372, v373, v374, v375, v376, v377, v378, v379, v380, v381, v382, 0x0, 0x0)
+      check: addr_0_block_86: // no preds!
+      nextln:   jump addr_0_block_88
+      check: addr_0_block_87: // no preds!
+      nextln:   jump addr_0_block_88
+      check: addr_0_block_88: // preds: addr_0_block_86 addr_0_block_87
+      nextln:   jumpif v430, addr_0_block_89, addr_0_block_90
+      check: addr_0_block_89: // preds: addr_0_block_88
+      nextln:   jump addr_0_block_91
+      check: addr_0_block_90: // preds: addr_0_block_88
+      nextln:   jump addr_0_block_91
+      check: addr_0_block_91: // preds: addr_0_block_89 addr_0_block_90
+      nextln:   v1337 = i52.unsigned_from_bits v380
+      nextln:   v1338 = int.modulo v1337, 0x8
+      nextln:   v1339 = int.sub v1337, v1338
+      nextln:   v1340 = i52.to_bits v1339
+      nextln:   v1341 = bool.icmp.i52.eq v380, v1340
+      nextln:   v1342 = bool.icmp.i52.eq v380, 0x13000000
+      nextln:   jumpif v1342, addr_0_block_92, addr_0_block_96
+      check: addr_0_block_92: // preds: addr_0_block_91
+      nextln:   v1343 = i64.unsigned_from_bits v438
+      nextln:   v1344 = bool.icmp.int.eq v1343, 0x4
+      nextln:   jumpif v1344, addr_0_block_93, addr_0_block_94
+      nextln:   jump addr_0_block_97
+      check: addr_0_block_93: // no preds!
+      nextln:   jump addr_0_block_95
+      check: addr_0_block_94: // no preds!
+      nextln:   v1345 = i8.trunc.i64 v438
+      nextln:   v1346 = i8.unsigned_from_bits v1345
+      nextln:   jump addr_0_block_95
+      check: addr_0_block_95: // preds: addr_0_block_93 addr_0_block_94
+      check: addr_0_block_96: // preds: addr_0_block_91
+      nextln:   store.i64 v438, v380
+      nextln:   jump addr_0_block_97
+      check: addr_0_block_97: // preds: addr_0_block_92 addr_0_block_96
+      check: addr_0_block_98: // preds: addr_0_block_84
+      nextln:   jump addr_0_block_99(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_99(v439: i8, v440: i1, v441: i16, v442: i8, v443: bool, v444: bool, v445: bool, v446: int, v447: i64, v448: i8, v449: i8, v450: i52, v451: i1, v452: bool, v453: bool, v454: int, v455: i1, v456: bool, v457: i4, v458: i2, v459: i4, v460: i8, v461: i8, v462: i2, v463: i2, v464: bool, v465: i2, v466: i2, v467: bool, v468: bool, v469: bool, v470: bool, v471: i52, v472: i1, v473: i64, v474: i2, v475: bool): // preds: addr_0_block_85 addr_0_block_98
+      nextln:   v476 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v477 = bool.bitwise_not v476
+      nextln:   v478 = bool.and v477, 0x1
+      nextln:   v479 = bool.icmp.i8.ne v384, 0x0
+      nextln:   v480 = bool.bitwise_not v479
+      nextln:   v481 = bool.and 0x1, v480
+      nextln:   jumpif v481, addr_0_block_100, addr_0_block_101
+      check: addr_0_block_100: // preds: addr_0_block_99
+      nextln:   jump addr_0_block_102
+      check: addr_0_block_101: // preds: addr_0_block_99
+      nextln:   jump addr_0_block_102
+      check: addr_0_block_102: // preds: addr_0_block_100 addr_0_block_101
+      nextln:   v482 = bool.icmp.i8.ne v384, 0x0
+      nextln:   jumpif v482, addr_0_block_103, addr_0_block_104
+      check: addr_0_block_103: // preds: addr_0_block_102
+      nextln:   jump addr_0_block_105
+      check: addr_0_block_104: // preds: addr_0_block_102
+      nextln:   jump addr_0_block_105
+      check: addr_0_block_105: // preds: addr_0_block_103 addr_0_block_104
+      nextln:   v483 = i52.unsigned_from_bits v407
+      nextln:   v484 = int.modulo v483, 0x1
+      nextln:   v485 = int.sub v483, v484
+      nextln:   v486 = i52.to_bits v485
+      nextln:   v487 = bool.icmp.i52.eq v407, v486
+      nextln:   v488 = i8.load v407
+      nextln:   v489 = i64.and v334, 0xffffffffff00ffff
+      nextln:   v490 = i8.lshl v488, 0x10
+      nextln:   v491 = i64.or v489, v490
+      nextln:   v492 = i64.wrapping_add v0, 0x3
+      nextln:   v493 = i64.unsigned_from_bits v492
+      nextln:   v494 = int.modulo v493, 0x1
+      nextln:   v495 = int.sub v493, v494
+      nextln:   v496 = i64.to_bits v495
+      nextln:   v497 = bool.icmp.i64.eq v492, v496
+      nextln:   v498 = i64.lshr v492, 0x30
+      nextln:   v499 = i16.trunc.i64 v498
+      nextln:   v500 = bool.icmp.i16.eq v499, 0x0
+      nextln:   v501 = bool.bitwise_not v500
+      nextln:   jumpif v501, addr_0_block_106, addr_0_block_107
+      check: addr_0_block_106: // preds: addr_0_block_105
+      nextln:   jump addr_0_block_108(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_109(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_107: // preds: addr_0_block_105
+      nextln:   jump addr_0_block_108(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_108(v1297: i52, v1298: int, v1299: bool, v1300: bool): // preds: addr_0_block_107
+      nextln:   v1301 = i52.trunc.i64 v492
+      nextln:   jump addr_0_block_109(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1301, 0x1, 0x0)
+      check: addr_0_block_109(v502: i3, v503: i1, v504: i1, v505: i1, v506: i1, v507: i4, v508: i1, v509: bool, v510: int, v511: int, v512: bool, v513: bool, v514: i8, v515: i8, v516: i52, v517: i1, v518: bool, v519: bool, v520: int, v521: i1, v522: bool, v523: i4, v524: i2, v525: i4, v526: i8, v527: i8, v528: i2, v529: i2, v530: bool, v531: i2, v532: i2, v533: bool, v534: bool, v535: bool, v536: bool, v537: i52, v538: i1, v539: i64, v540: i1, v541: i8, v542: i8, v543: i52, v544: i1, v545: bool, v546: bool, v547: int, v548: i1, v549: bool, v550: i4, v551: i2, v552: i4, v553: i8, v554: i8, v555: i2, v556: i2, v557: bool, v558: i2, v559: i2, v560: bool, v561: bool, v562: bool, v563: bool, v564: i52, v565: i1, v566: i64): // preds: addr_0_block_106 addr_0_block_108
+      nextln:   v567 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v568 = bool.bitwise_not v567
+      nextln:   v569 = bool.bitwise_not v5
+      nextln:   v570 = bool.and v569, 0x1
+      nextln:   v571 = bool.or v570, 0x0
+      nextln:   v572 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v573 = bool.bitwise_not v572
+      nextln:   v574 = bool.and v571, v573
+      nextln:   v575 = bool.icmp.i8.eq v553, 0x1
+      nextln:   v576 = bool.and v574, v575
+      nextln:   jumpif v576, addr_0_block_110, addr_0_block_111
+      check: addr_0_block_110: // preds: addr_0_block_109
+      nextln:   jump addr_0_block_112
+      check: addr_0_block_111: // preds: addr_0_block_109
+      nextln:   jump addr_0_block_112
+      check: addr_0_block_112: // preds: addr_0_block_110 addr_0_block_111
+      nextln:   v577 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v578 = bool.bitwise_not v577
+      nextln:   v579 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v580 = bool.bitwise_not v579
+      nextln:   v581 = bool.icmp.i8.eq v553, 0x1
+      nextln:   v582 = bool.and v580, v581
+      nextln:   jumpif v512, addr_0_block_113, addr_0_block_114
+      check: addr_0_block_113: // preds: addr_0_block_112
+      nextln:   v583 = bool.icmp.i8.eq v541, 0x0
+      nextln:   jump addr_0_block_115(0x1)
+      check: addr_0_block_114: // preds: addr_0_block_112
+      nextln:   jump addr_0_block_115(0x0)
+      check: addr_0_block_115(v584: bool): // preds: addr_0_block_113 addr_0_block_114
+      nextln:   v585 = bool.icmp.i8.eq v541, 0x0
+      nextln:   v586 = bool.and v513, v585
+      nextln:   jumpif v586, addr_0_block_116, addr_0_block_117
+      check: addr_0_block_116: // preds: addr_0_block_115
+      nextln:   jump addr_0_block_118(0x0, 0x0)
+      check: addr_0_block_117: // preds: addr_0_block_115
+      nextln:   jump addr_0_block_118(0x0, 0x0)
+      check: addr_0_block_118(v587: bool, v588: bool): // preds: addr_0_block_116 addr_0_block_117
+      nextln:   v589 = bool.or v584, v587
+      nextln:   jumpif v589, addr_0_block_119, addr_0_block_132
+      check: addr_0_block_119: // preds: addr_0_block_118
+      nextln:   v590 = i52.unsigned_from_bits v537
+      nextln:   v591 = int.modulo v590, 0x8
+      nextln:   v592 = int.sub v590, v591
+      nextln:   v593 = i52.to_bits v592
+      nextln:   v594 = bool.icmp.i52.eq v537, v593
+      nextln:   v595 = i64.load v537
+      nextln:   jumpif v584, addr_0_block_120, addr_0_block_121
+      nextln:   jump addr_0_block_133(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v595, v514, v515, v516, v517, v518, v519, v520, v521, v522, v523, v524, v525, v526, v527, v528, v529, v530, v531, v532, v533, v534, v535, v536, v537, v538, v539, 0x0, 0x0)
+      check: addr_0_block_120: // no preds!
+      nextln:   jump addr_0_block_122
+      check: addr_0_block_121: // no preds!
+      nextln:   jump addr_0_block_122
+      check: addr_0_block_122: // preds: addr_0_block_120 addr_0_block_121
+      nextln:   jumpif v587, addr_0_block_123, addr_0_block_124
+      check: addr_0_block_123: // preds: addr_0_block_122
+      nextln:   jump addr_0_block_125
+      check: addr_0_block_124: // preds: addr_0_block_122
+      nextln:   jump addr_0_block_125
+      check: addr_0_block_125: // preds: addr_0_block_123 addr_0_block_124
+      nextln:   v1347 = i52.unsigned_from_bits v537
+      nextln:   v1348 = int.modulo v1347, 0x8
+      nextln:   v1349 = int.sub v1347, v1348
+      nextln:   v1350 = i52.to_bits v1349
+      nextln:   v1351 = bool.icmp.i52.eq v537, v1350
+      nextln:   v1352 = bool.icmp.i52.eq v537, 0x13000000
+      nextln:   jumpif v1352, addr_0_block_126, addr_0_block_130
+      check: addr_0_block_126: // preds: addr_0_block_125
+      nextln:   v1353 = i64.unsigned_from_bits v595
+      nextln:   v1354 = bool.icmp.int.eq v1353, 0x4
+      nextln:   jumpif v1354, addr_0_block_127, addr_0_block_128
+      nextln:   jump addr_0_block_131
+      check: addr_0_block_127: // no preds!
+      nextln:   jump addr_0_block_129
+      check: addr_0_block_128: // no preds!
+      nextln:   v1355 = i8.trunc.i64 v595
+      nextln:   v1356 = i8.unsigned_from_bits v1355
+      nextln:   jump addr_0_block_129
+      check: addr_0_block_129: // preds: addr_0_block_127 addr_0_block_128
+      check: addr_0_block_130: // preds: addr_0_block_125
+      nextln:   store.i64 v595, v537
+      nextln:   jump addr_0_block_131
+      check: addr_0_block_131: // preds: addr_0_block_126 addr_0_block_130
+      check: addr_0_block_132: // preds: addr_0_block_118
+      nextln:   jump addr_0_block_133(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_133(v596: i8, v597: i1, v598: i16, v599: i8, v600: bool, v601: bool, v602: bool, v603: int, v604: i64, v605: i8, v606: i8, v607: i52, v608: i1, v609: bool, v610: bool, v611: int, v612: i1, v613: bool, v614: i4, v615: i2, v616: i4, v617: i8, v618: i8, v619: i2, v620: i2, v621: bool, v622: i2, v623: i2, v624: bool, v625: bool, v626: bool, v627: bool, v628: i52, v629: i1, v630: i64, v631: i2, v632: bool): // preds: addr_0_block_119 addr_0_block_132
+      nextln:   v633 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v634 = bool.bitwise_not v633
+      nextln:   v635 = bool.and v634, 0x1
+      nextln:   v636 = bool.icmp.i8.ne v541, 0x0
+      nextln:   v637 = bool.bitwise_not v636
+      nextln:   v638 = bool.and 0x1, v637
+      nextln:   jumpif v638, addr_0_block_134, addr_0_block_135
+      check: addr_0_block_134: // preds: addr_0_block_133
+      nextln:   jump addr_0_block_136
+      check: addr_0_block_135: // preds: addr_0_block_133
+      nextln:   jump addr_0_block_136
+      check: addr_0_block_136: // preds: addr_0_block_134 addr_0_block_135
+      nextln:   v639 = bool.icmp.i8.ne v541, 0x0
+      nextln:   jumpif v639, addr_0_block_137, addr_0_block_138
+      check: addr_0_block_137: // preds: addr_0_block_136
+      nextln:   jump addr_0_block_139
+      check: addr_0_block_138: // preds: addr_0_block_136
+      nextln:   jump addr_0_block_139
+      check: addr_0_block_139: // preds: addr_0_block_137 addr_0_block_138
+      nextln:   v640 = i52.unsigned_from_bits v564
+      nextln:   v641 = int.modulo v640, 0x1
+      nextln:   v642 = int.sub v640, v641
+      nextln:   v643 = i52.to_bits v642
+      nextln:   v644 = bool.icmp.i52.eq v564, v643
+      nextln:   v645 = i8.load v564
+      nextln:   v646 = i64.and v491, 0xffffffff00ffffff
+      nextln:   v647 = i8.lshl v645, 0x18
+      nextln:   v648 = i64.or v646, v647
+      nextln:   v649 = i64.wrapping_add v0, 0x4
+      nextln:   v650 = i64.unsigned_from_bits v649
+      nextln:   v651 = int.modulo v650, 0x1
+      nextln:   v652 = int.sub v650, v651
+      nextln:   v653 = i64.to_bits v652
+      nextln:   v654 = bool.icmp.i64.eq v649, v653
+      nextln:   v655 = i64.lshr v649, 0x30
+      nextln:   v656 = i16.trunc.i64 v655
+      nextln:   v657 = bool.icmp.i16.eq v656, 0x0
+      nextln:   v658 = bool.bitwise_not v657
+      nextln:   jumpif v658, addr_0_block_140, addr_0_block_141
+      check: addr_0_block_140: // preds: addr_0_block_139
+      nextln:   jump addr_0_block_142(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_143(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_141: // preds: addr_0_block_139
+      nextln:   jump addr_0_block_142(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_142(v1292: i52, v1293: int, v1294: bool, v1295: bool): // preds: addr_0_block_141
+      nextln:   v1296 = i52.trunc.i64 v649
+      nextln:   jump addr_0_block_143(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1296, 0x1, 0x0)
+      check: addr_0_block_143(v659: i3, v660: i1, v661: i1, v662: i1, v663: i1, v664: i4, v665: i1, v666: bool, v667: int, v668: int, v669: bool, v670: bool, v671: i8, v672: i8, v673: i52, v674: i1, v675: bool, v676: bool, v677: int, v678: i1, v679: bool, v680: i4, v681: i2, v682: i4, v683: i8, v684: i8, v685: i2, v686: i2, v687: bool, v688: i2, v689: i2, v690: bool, v691: bool, v692: bool, v693: bool, v694: i52, v695: i1, v696: i64, v697: i1, v698: i8, v699: i8, v700: i52, v701: i1, v702: bool, v703: bool, v704: int, v705: i1, v706: bool, v707: i4, v708: i2, v709: i4, v710: i8, v711: i8, v712: i2, v713: i2, v714: bool, v715: i2, v716: i2, v717: bool, v718: bool, v719: bool, v720: bool, v721: i52, v722: i1, v723: i64): // preds: addr_0_block_140 addr_0_block_142
+      nextln:   v724 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v725 = bool.bitwise_not v724
+      nextln:   v726 = bool.bitwise_not v5
+      nextln:   v727 = bool.and v726, 0x1
+      nextln:   v728 = bool.or v727, 0x0
+      nextln:   v729 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v730 = bool.bitwise_not v729
+      nextln:   v731 = bool.and v728, v730
+      nextln:   v732 = bool.icmp.i8.eq v710, 0x1
+      nextln:   v733 = bool.and v731, v732
+      nextln:   jumpif v733, addr_0_block_144, addr_0_block_145
+      check: addr_0_block_144: // preds: addr_0_block_143
+      nextln:   jump addr_0_block_146
+      check: addr_0_block_145: // preds: addr_0_block_143
+      nextln:   jump addr_0_block_146
+      check: addr_0_block_146: // preds: addr_0_block_144 addr_0_block_145
+      nextln:   v734 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v735 = bool.bitwise_not v734
+      nextln:   v736 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v737 = bool.bitwise_not v736
+      nextln:   v738 = bool.icmp.i8.eq v710, 0x1
+      nextln:   v739 = bool.and v737, v738
+      nextln:   jumpif v669, addr_0_block_147, addr_0_block_148
+      check: addr_0_block_147: // preds: addr_0_block_146
+      nextln:   v740 = bool.icmp.i8.eq v698, 0x0
+      nextln:   jump addr_0_block_149(0x1)
+      check: addr_0_block_148: // preds: addr_0_block_146
+      nextln:   jump addr_0_block_149(0x0)
+      check: addr_0_block_149(v741: bool): // preds: addr_0_block_147 addr_0_block_148
+      nextln:   v742 = bool.icmp.i8.eq v698, 0x0
+      nextln:   v743 = bool.and v670, v742
+      nextln:   jumpif v743, addr_0_block_150, addr_0_block_151
+      check: addr_0_block_150: // preds: addr_0_block_149
+      nextln:   jump addr_0_block_152(0x0, 0x0)
+      check: addr_0_block_151: // preds: addr_0_block_149
+      nextln:   jump addr_0_block_152(0x0, 0x0)
+      check: addr_0_block_152(v744: bool, v745: bool): // preds: addr_0_block_150 addr_0_block_151
+      nextln:   v746 = bool.or v741, v744
+      nextln:   jumpif v746, addr_0_block_153, addr_0_block_166
+      check: addr_0_block_153: // preds: addr_0_block_152
+      nextln:   v747 = i52.unsigned_from_bits v694
+      nextln:   v748 = int.modulo v747, 0x8
+      nextln:   v749 = int.sub v747, v748
+      nextln:   v750 = i52.to_bits v749
+      nextln:   v751 = bool.icmp.i52.eq v694, v750
+      nextln:   v752 = i64.load v694
+      nextln:   jumpif v741, addr_0_block_154, addr_0_block_155
+      nextln:   jump addr_0_block_167(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v752, v671, v672, v673, v674, v675, v676, v677, v678, v679, v680, v681, v682, v683, v684, v685, v686, v687, v688, v689, v690, v691, v692, v693, v694, v695, v696, 0x0, 0x0)
+      check: addr_0_block_154: // no preds!
+      nextln:   jump addr_0_block_156
+      check: addr_0_block_155: // no preds!
+      nextln:   jump addr_0_block_156
+      check: addr_0_block_156: // preds: addr_0_block_154 addr_0_block_155
+      nextln:   jumpif v744, addr_0_block_157, addr_0_block_158
+      check: addr_0_block_157: // preds: addr_0_block_156
+      nextln:   jump addr_0_block_159
+      check: addr_0_block_158: // preds: addr_0_block_156
+      nextln:   jump addr_0_block_159
+      check: addr_0_block_159: // preds: addr_0_block_157 addr_0_block_158
+      nextln:   v1357 = i52.unsigned_from_bits v694
+      nextln:   v1358 = int.modulo v1357, 0x8
+      nextln:   v1359 = int.sub v1357, v1358
+      nextln:   v1360 = i52.to_bits v1359
+      nextln:   v1361 = bool.icmp.i52.eq v694, v1360
+      nextln:   v1362 = bool.icmp.i52.eq v694, 0x13000000
+      nextln:   jumpif v1362, addr_0_block_160, addr_0_block_164
+      check: addr_0_block_160: // preds: addr_0_block_159
+      nextln:   v1363 = i64.unsigned_from_bits v752
+      nextln:   v1364 = bool.icmp.int.eq v1363, 0x4
+      nextln:   jumpif v1364, addr_0_block_161, addr_0_block_162
+      nextln:   jump addr_0_block_165
+      check: addr_0_block_161: // no preds!
+      nextln:   jump addr_0_block_163
+      check: addr_0_block_162: // no preds!
+      nextln:   v1365 = i8.trunc.i64 v752
+      nextln:   v1366 = i8.unsigned_from_bits v1365
+      nextln:   jump addr_0_block_163
+      check: addr_0_block_163: // preds: addr_0_block_161 addr_0_block_162
+      check: addr_0_block_164: // preds: addr_0_block_159
+      nextln:   store.i64 v752, v694
+      nextln:   jump addr_0_block_165
+      check: addr_0_block_165: // preds: addr_0_block_160 addr_0_block_164
+      check: addr_0_block_166: // preds: addr_0_block_152
+      nextln:   jump addr_0_block_167(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_167(v753: i8, v754: i1, v755: i16, v756: i8, v757: bool, v758: bool, v759: bool, v760: int, v761: i64, v762: i8, v763: i8, v764: i52, v765: i1, v766: bool, v767: bool, v768: int, v769: i1, v770: bool, v771: i4, v772: i2, v773: i4, v774: i8, v775: i8, v776: i2, v777: i2, v778: bool, v779: i2, v780: i2, v781: bool, v782: bool, v783: bool, v784: bool, v785: i52, v786: i1, v787: i64, v788: i2, v789: bool): // preds: addr_0_block_153 addr_0_block_166
+      nextln:   v790 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v791 = bool.bitwise_not v790
+      nextln:   v792 = bool.and v791, 0x1
+      nextln:   v793 = bool.icmp.i8.ne v698, 0x0
+      nextln:   v794 = bool.bitwise_not v793
+      nextln:   v795 = bool.and 0x1, v794
+      nextln:   jumpif v795, addr_0_block_168, addr_0_block_169
+      check: addr_0_block_168: // preds: addr_0_block_167
+      nextln:   jump addr_0_block_170
+      check: addr_0_block_169: // preds: addr_0_block_167
+      nextln:   jump addr_0_block_170
+      check: addr_0_block_170: // preds: addr_0_block_168 addr_0_block_169
+      nextln:   v796 = bool.icmp.i8.ne v698, 0x0
+      nextln:   jumpif v796, addr_0_block_171, addr_0_block_172
+      check: addr_0_block_171: // preds: addr_0_block_170
+      nextln:   jump addr_0_block_173
+      check: addr_0_block_172: // preds: addr_0_block_170
+      nextln:   jump addr_0_block_173
+      check: addr_0_block_173: // preds: addr_0_block_171 addr_0_block_172
+      nextln:   v797 = i52.unsigned_from_bits v721
+      nextln:   v798 = int.modulo v797, 0x1
+      nextln:   v799 = int.sub v797, v798
+      nextln:   v800 = i52.to_bits v799
+      nextln:   v801 = bool.icmp.i52.eq v721, v800
+      nextln:   v802 = i8.load v721
+      nextln:   v803 = i64.and v648, 0xffffff00ffffffff
+      nextln:   v804 = i8.lshl v802, 0x20
+      nextln:   v805 = i64.or v803, v804
+      nextln:   v806 = i64.wrapping_add v0, 0x5
+      nextln:   v807 = i64.unsigned_from_bits v806
+      nextln:   v808 = int.modulo v807, 0x1
+      nextln:   v809 = int.sub v807, v808
+      nextln:   v810 = i64.to_bits v809
+      nextln:   v811 = bool.icmp.i64.eq v806, v810
+      nextln:   v812 = i64.lshr v806, 0x30
+      nextln:   v813 = i16.trunc.i64 v812
+      nextln:   v814 = bool.icmp.i16.eq v813, 0x0
+      nextln:   v815 = bool.bitwise_not v814
+      nextln:   jumpif v815, addr_0_block_174, addr_0_block_175
+      check: addr_0_block_174: // preds: addr_0_block_173
+      nextln:   jump addr_0_block_176(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_177(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_175: // preds: addr_0_block_173
+      nextln:   jump addr_0_block_176(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_176(v1287: i52, v1288: int, v1289: bool, v1290: bool): // preds: addr_0_block_175
+      nextln:   v1291 = i52.trunc.i64 v806
+      nextln:   jump addr_0_block_177(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1291, 0x1, 0x0)
+      check: addr_0_block_177(v816: i3, v817: i1, v818: i1, v819: i1, v820: i1, v821: i4, v822: i1, v823: bool, v824: int, v825: int, v826: bool, v827: bool, v828: i8, v829: i8, v830: i52, v831: i1, v832: bool, v833: bool, v834: int, v835: i1, v836: bool, v837: i4, v838: i2, v839: i4, v840: i8, v841: i8, v842: i2, v843: i2, v844: bool, v845: i2, v846: i2, v847: bool, v848: bool, v849: bool, v850: bool, v851: i52, v852: i1, v853: i64, v854: i1, v855: i8, v856: i8, v857: i52, v858: i1, v859: bool, v860: bool, v861: int, v862: i1, v863: bool, v864: i4, v865: i2, v866: i4, v867: i8, v868: i8, v869: i2, v870: i2, v871: bool, v872: i2, v873: i2, v874: bool, v875: bool, v876: bool, v877: bool, v878: i52, v879: i1, v880: i64): // preds: addr_0_block_174 addr_0_block_176
+      nextln:   v881 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v882 = bool.bitwise_not v881
+      nextln:   v883 = bool.bitwise_not v5
+      nextln:   v884 = bool.and v883, 0x1
+      nextln:   v885 = bool.or v884, 0x0
+      nextln:   v886 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v887 = bool.bitwise_not v886
+      nextln:   v888 = bool.and v885, v887
+      nextln:   v889 = bool.icmp.i8.eq v867, 0x1
+      nextln:   v890 = bool.and v888, v889
+      nextln:   jumpif v890, addr_0_block_178, addr_0_block_179
+      check: addr_0_block_178: // preds: addr_0_block_177
+      nextln:   jump addr_0_block_180
+      check: addr_0_block_179: // preds: addr_0_block_177
+      nextln:   jump addr_0_block_180
+      check: addr_0_block_180: // preds: addr_0_block_178 addr_0_block_179
+      nextln:   v891 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v892 = bool.bitwise_not v891
+      nextln:   v893 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v894 = bool.bitwise_not v893
+      nextln:   v895 = bool.icmp.i8.eq v867, 0x1
+      nextln:   v896 = bool.and v894, v895
+      nextln:   jumpif v826, addr_0_block_181, addr_0_block_182
+      check: addr_0_block_181: // preds: addr_0_block_180
+      nextln:   v897 = bool.icmp.i8.eq v855, 0x0
+      nextln:   jump addr_0_block_183(0x1)
+      check: addr_0_block_182: // preds: addr_0_block_180
+      nextln:   jump addr_0_block_183(0x0)
+      check: addr_0_block_183(v898: bool): // preds: addr_0_block_181 addr_0_block_182
+      nextln:   v899 = bool.icmp.i8.eq v855, 0x0
+      nextln:   v900 = bool.and v827, v899
+      nextln:   jumpif v900, addr_0_block_184, addr_0_block_185
+      check: addr_0_block_184: // preds: addr_0_block_183
+      nextln:   jump addr_0_block_186(0x0, 0x0)
+      check: addr_0_block_185: // preds: addr_0_block_183
+      nextln:   jump addr_0_block_186(0x0, 0x0)
+      check: addr_0_block_186(v901: bool, v902: bool): // preds: addr_0_block_184 addr_0_block_185
+      nextln:   v903 = bool.or v898, v901
+      nextln:   jumpif v903, addr_0_block_187, addr_0_block_200
+      check: addr_0_block_187: // preds: addr_0_block_186
+      nextln:   v904 = i52.unsigned_from_bits v851
+      nextln:   v905 = int.modulo v904, 0x8
+      nextln:   v906 = int.sub v904, v905
+      nextln:   v907 = i52.to_bits v906
+      nextln:   v908 = bool.icmp.i52.eq v851, v907
+      nextln:   v909 = i64.load v851
+      nextln:   jumpif v898, addr_0_block_188, addr_0_block_189
+      nextln:   jump addr_0_block_201(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v909, v828, v829, v830, v831, v832, v833, v834, v835, v836, v837, v838, v839, v840, v841, v842, v843, v844, v845, v846, v847, v848, v849, v850, v851, v852, v853, 0x0, 0x0)
+      check: addr_0_block_188: // no preds!
+      nextln:   jump addr_0_block_190
+      check: addr_0_block_189: // no preds!
+      nextln:   jump addr_0_block_190
+      check: addr_0_block_190: // preds: addr_0_block_188 addr_0_block_189
+      nextln:   jumpif v901, addr_0_block_191, addr_0_block_192
+      check: addr_0_block_191: // preds: addr_0_block_190
+      nextln:   jump addr_0_block_193
+      check: addr_0_block_192: // preds: addr_0_block_190
+      nextln:   jump addr_0_block_193
+      check: addr_0_block_193: // preds: addr_0_block_191 addr_0_block_192
+      nextln:   v1367 = i52.unsigned_from_bits v851
+      nextln:   v1368 = int.modulo v1367, 0x8
+      nextln:   v1369 = int.sub v1367, v1368
+      nextln:   v1370 = i52.to_bits v1369
+      nextln:   v1371 = bool.icmp.i52.eq v851, v1370
+      nextln:   v1372 = bool.icmp.i52.eq v851, 0x13000000
+      nextln:   jumpif v1372, addr_0_block_194, addr_0_block_198
+      check: addr_0_block_194: // preds: addr_0_block_193
+      nextln:   v1373 = i64.unsigned_from_bits v909
+      nextln:   v1374 = bool.icmp.int.eq v1373, 0x4
+      nextln:   jumpif v1374, addr_0_block_195, addr_0_block_196
+      nextln:   jump addr_0_block_199
+      check: addr_0_block_195: // no preds!
+      nextln:   jump addr_0_block_197
+      check: addr_0_block_196: // no preds!
+      nextln:   v1375 = i8.trunc.i64 v909
+      nextln:   v1376 = i8.unsigned_from_bits v1375
+      nextln:   jump addr_0_block_197
+      check: addr_0_block_197: // preds: addr_0_block_195 addr_0_block_196
+      check: addr_0_block_198: // preds: addr_0_block_193
+      nextln:   store.i64 v909, v851
+      nextln:   jump addr_0_block_199
+      check: addr_0_block_199: // preds: addr_0_block_194 addr_0_block_198
+      check: addr_0_block_200: // preds: addr_0_block_186
+      nextln:   jump addr_0_block_201(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_201(v910: i8, v911: i1, v912: i16, v913: i8, v914: bool, v915: bool, v916: bool, v917: int, v918: i64, v919: i8, v920: i8, v921: i52, v922: i1, v923: bool, v924: bool, v925: int, v926: i1, v927: bool, v928: i4, v929: i2, v930: i4, v931: i8, v932: i8, v933: i2, v934: i2, v935: bool, v936: i2, v937: i2, v938: bool, v939: bool, v940: bool, v941: bool, v942: i52, v943: i1, v944: i64, v945: i2, v946: bool): // preds: addr_0_block_187 addr_0_block_200
+      nextln:   v947 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v948 = bool.bitwise_not v947
+      nextln:   v949 = bool.and v948, 0x1
+      nextln:   v950 = bool.icmp.i8.ne v855, 0x0
+      nextln:   v951 = bool.bitwise_not v950
+      nextln:   v952 = bool.and 0x1, v951
+      nextln:   jumpif v952, addr_0_block_202, addr_0_block_203
+      check: addr_0_block_202: // preds: addr_0_block_201
+      nextln:   jump addr_0_block_204
+      check: addr_0_block_203: // preds: addr_0_block_201
+      nextln:   jump addr_0_block_204
+      check: addr_0_block_204: // preds: addr_0_block_202 addr_0_block_203
+      nextln:   v953 = bool.icmp.i8.ne v855, 0x0
+      nextln:   jumpif v953, addr_0_block_205, addr_0_block_206
+      check: addr_0_block_205: // preds: addr_0_block_204
+      nextln:   jump addr_0_block_207
+      check: addr_0_block_206: // preds: addr_0_block_204
+      nextln:   jump addr_0_block_207
+      check: addr_0_block_207: // preds: addr_0_block_205 addr_0_block_206
+      nextln:   v954 = i52.unsigned_from_bits v878
+      nextln:   v955 = int.modulo v954, 0x1
+      nextln:   v956 = int.sub v954, v955
+      nextln:   v957 = i52.to_bits v956
+      nextln:   v958 = bool.icmp.i52.eq v878, v957
+      nextln:   v959 = i8.load v878
+      nextln:   v960 = i64.and v805, 0xffff00ffffffffff
+      nextln:   v961 = i8.lshl v959, 0x28
+      nextln:   v962 = i64.or v960, v961
+      nextln:   v963 = i64.wrapping_add v0, 0x6
+      nextln:   v964 = i64.unsigned_from_bits v963
+      nextln:   v965 = int.modulo v964, 0x1
+      nextln:   v966 = int.sub v964, v965
+      nextln:   v967 = i64.to_bits v966
+      nextln:   v968 = bool.icmp.i64.eq v963, v967
+      nextln:   v969 = i64.lshr v963, 0x30
+      nextln:   v970 = i16.trunc.i64 v969
+      nextln:   v971 = bool.icmp.i16.eq v970, 0x0
+      nextln:   v972 = bool.bitwise_not v971
+      nextln:   jumpif v972, addr_0_block_208, addr_0_block_209
+      check: addr_0_block_208: // preds: addr_0_block_207
+      nextln:   jump addr_0_block_210(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_211(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_209: // preds: addr_0_block_207
+      nextln:   jump addr_0_block_210(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_210(v1282: i52, v1283: int, v1284: bool, v1285: bool): // preds: addr_0_block_209
+      nextln:   v1286 = i52.trunc.i64 v963
+      nextln:   jump addr_0_block_211(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1286, 0x1, 0x0)
+      check: addr_0_block_211(v973: i3, v974: i1, v975: i1, v976: i1, v977: i1, v978: i4, v979: i1, v980: bool, v981: int, v982: int, v983: bool, v984: bool, v985: i8, v986: i8, v987: i52, v988: i1, v989: bool, v990: bool, v991: int, v992: i1, v993: bool, v994: i4, v995: i2, v996: i4, v997: i8, v998: i8, v999: i2, v1000: i2, v1001: bool, v1002: i2, v1003: i2, v1004: bool, v1005: bool, v1006: bool, v1007: bool, v1008: i52, v1009: i1, v1010: i64, v1011: i1, v1012: i8, v1013: i8, v1014: i52, v1015: i1, v1016: bool, v1017: bool, v1018: int, v1019: i1, v1020: bool, v1021: i4, v1022: i2, v1023: i4, v1024: i8, v1025: i8, v1026: i2, v1027: i2, v1028: bool, v1029: i2, v1030: i2, v1031: bool, v1032: bool, v1033: bool, v1034: bool, v1035: i52, v1036: i1, v1037: i64): // preds: addr_0_block_208 addr_0_block_210
+      nextln:   v1038 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1039 = bool.bitwise_not v1038
+      nextln:   v1040 = bool.bitwise_not v5
+      nextln:   v1041 = bool.and v1040, 0x1
+      nextln:   v1042 = bool.or v1041, 0x0
+      nextln:   v1043 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1044 = bool.bitwise_not v1043
+      nextln:   v1045 = bool.and v1042, v1044
+      nextln:   v1046 = bool.icmp.i8.eq v1024, 0x1
+      nextln:   v1047 = bool.and v1045, v1046
+      nextln:   jumpif v1047, addr_0_block_212, addr_0_block_213
+      check: addr_0_block_212: // preds: addr_0_block_211
+      nextln:   jump addr_0_block_214
+      check: addr_0_block_213: // preds: addr_0_block_211
+      nextln:   jump addr_0_block_214
+      check: addr_0_block_214: // preds: addr_0_block_212 addr_0_block_213
+      nextln:   v1048 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1049 = bool.bitwise_not v1048
+      nextln:   v1050 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1051 = bool.bitwise_not v1050
+      nextln:   v1052 = bool.icmp.i8.eq v1024, 0x1
+      nextln:   v1053 = bool.and v1051, v1052
+      nextln:   jumpif v983, addr_0_block_215, addr_0_block_216
+      check: addr_0_block_215: // preds: addr_0_block_214
+      nextln:   v1054 = bool.icmp.i8.eq v1012, 0x0
+      nextln:   jump addr_0_block_217(0x1)
+      check: addr_0_block_216: // preds: addr_0_block_214
+      nextln:   jump addr_0_block_217(0x0)
+      check: addr_0_block_217(v1055: bool): // preds: addr_0_block_215 addr_0_block_216
+      nextln:   v1056 = bool.icmp.i8.eq v1012, 0x0
+      nextln:   v1057 = bool.and v984, v1056
+      nextln:   jumpif v1057, addr_0_block_218, addr_0_block_219
+      check: addr_0_block_218: // preds: addr_0_block_217
+      nextln:   jump addr_0_block_220(0x0, 0x0)
+      check: addr_0_block_219: // preds: addr_0_block_217
+      nextln:   jump addr_0_block_220(0x0, 0x0)
+      check: addr_0_block_220(v1058: bool, v1059: bool): // preds: addr_0_block_218 addr_0_block_219
+      nextln:   v1060 = bool.or v1055, v1058
+      nextln:   jumpif v1060, addr_0_block_221, addr_0_block_234
+      check: addr_0_block_221: // preds: addr_0_block_220
+      nextln:   v1061 = i52.unsigned_from_bits v1008
+      nextln:   v1062 = int.modulo v1061, 0x8
+      nextln:   v1063 = int.sub v1061, v1062
+      nextln:   v1064 = i52.to_bits v1063
+      nextln:   v1065 = bool.icmp.i52.eq v1008, v1064
+      nextln:   v1066 = i64.load v1008
+      nextln:   jumpif v1055, addr_0_block_222, addr_0_block_223
+      nextln:   jump addr_0_block_235(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v1066, v985, v986, v987, v988, v989, v990, v991, v992, v993, v994, v995, v996, v997, v998, v999, v1000, v1001, v1002, v1003, v1004, v1005, v1006, v1007, v1008, v1009, v1010, 0x0, 0x0)
+      check: addr_0_block_222: // no preds!
+      nextln:   jump addr_0_block_224
+      check: addr_0_block_223: // no preds!
+      nextln:   jump addr_0_block_224
+      check: addr_0_block_224: // preds: addr_0_block_222 addr_0_block_223
+      nextln:   jumpif v1058, addr_0_block_225, addr_0_block_226
+      check: addr_0_block_225: // preds: addr_0_block_224
+      nextln:   jump addr_0_block_227
+      check: addr_0_block_226: // preds: addr_0_block_224
+      nextln:   jump addr_0_block_227
+      check: addr_0_block_227: // preds: addr_0_block_225 addr_0_block_226
+      nextln:   v1377 = i52.unsigned_from_bits v1008
+      nextln:   v1378 = int.modulo v1377, 0x8
+      nextln:   v1379 = int.sub v1377, v1378
+      nextln:   v1380 = i52.to_bits v1379
+      nextln:   v1381 = bool.icmp.i52.eq v1008, v1380
+      nextln:   v1382 = bool.icmp.i52.eq v1008, 0x13000000
+      nextln:   jumpif v1382, addr_0_block_228, addr_0_block_232
+      check: addr_0_block_228: // preds: addr_0_block_227
+      nextln:   v1383 = i64.unsigned_from_bits v1066
+      nextln:   v1384 = bool.icmp.int.eq v1383, 0x4
+      nextln:   jumpif v1384, addr_0_block_229, addr_0_block_230
+      nextln:   jump addr_0_block_233
+      check: addr_0_block_229: // no preds!
+      nextln:   jump addr_0_block_231
+      check: addr_0_block_230: // no preds!
+      nextln:   v1385 = i8.trunc.i64 v1066
+      nextln:   v1386 = i8.unsigned_from_bits v1385
+      nextln:   jump addr_0_block_231
+      check: addr_0_block_231: // preds: addr_0_block_229 addr_0_block_230
+      check: addr_0_block_232: // preds: addr_0_block_227
+      nextln:   store.i64 v1066, v1008
+      nextln:   jump addr_0_block_233
+      check: addr_0_block_233: // preds: addr_0_block_228 addr_0_block_232
+      check: addr_0_block_234: // preds: addr_0_block_220
+      nextln:   jump addr_0_block_235(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_235(v1067: i8, v1068: i1, v1069: i16, v1070: i8, v1071: bool, v1072: bool, v1073: bool, v1074: int, v1075: i64, v1076: i8, v1077: i8, v1078: i52, v1079: i1, v1080: bool, v1081: bool, v1082: int, v1083: i1, v1084: bool, v1085: i4, v1086: i2, v1087: i4, v1088: i8, v1089: i8, v1090: i2, v1091: i2, v1092: bool, v1093: i2, v1094: i2, v1095: bool, v1096: bool, v1097: bool, v1098: bool, v1099: i52, v1100: i1, v1101: i64, v1102: i2, v1103: bool): // preds: addr_0_block_221 addr_0_block_234
+      nextln:   v1104 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1105 = bool.bitwise_not v1104
+      nextln:   v1106 = bool.and v1105, 0x1
+      nextln:   v1107 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   v1108 = bool.bitwise_not v1107
+      nextln:   v1109 = bool.and 0x1, v1108
+      nextln:   jumpif v1109, addr_0_block_236, addr_0_block_237
+      check: addr_0_block_236: // preds: addr_0_block_235
+      nextln:   jump addr_0_block_238
+      check: addr_0_block_237: // preds: addr_0_block_235
+      nextln:   jump addr_0_block_238
+      check: addr_0_block_238: // preds: addr_0_block_236 addr_0_block_237
+      nextln:   v1110 = bool.icmp.i8.ne v1012, 0x0
+      nextln:   jumpif v1110, addr_0_block_239, addr_0_block_240
+      check: addr_0_block_239: // preds: addr_0_block_238
+      nextln:   jump addr_0_block_241
+      check: addr_0_block_240: // preds: addr_0_block_238
+      nextln:   jump addr_0_block_241
+      check: addr_0_block_241: // preds: addr_0_block_239 addr_0_block_240
+      nextln:   v1111 = i52.unsigned_from_bits v1035
+      nextln:   v1112 = int.modulo v1111, 0x1
+      nextln:   v1113 = int.sub v1111, v1112
+      nextln:   v1114 = i52.to_bits v1113
+      nextln:   v1115 = bool.icmp.i52.eq v1035, v1114
+      nextln:   v1116 = i8.load v1035
+      nextln:   v1117 = i64.and v962, 0xff00ffffffffffff
+      nextln:   v1118 = i8.lshl v1116, 0x30
+      nextln:   v1119 = i64.or v1117, v1118
+      nextln:   v1120 = i64.wrapping_add v0, 0x7
+      nextln:   v1121 = i64.unsigned_from_bits v1120
+      nextln:   v1122 = int.modulo v1121, 0x1
+      nextln:   v1123 = int.sub v1121, v1122
+      nextln:   v1124 = i64.to_bits v1123
+      nextln:   v1125 = bool.icmp.i64.eq v1120, v1124
+      nextln:   v1126 = i64.lshr v1120, 0x30
+      nextln:   v1127 = i16.trunc.i64 v1126
+      nextln:   v1128 = bool.icmp.i16.eq v1127, 0x0
+      nextln:   v1129 = bool.bitwise_not v1128
+      nextln:   jumpif v1129, addr_0_block_242, addr_0_block_243
+      check: addr_0_block_242: // preds: addr_0_block_241
+      nextln:   jump addr_0_block_244(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_245(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_243: // preds: addr_0_block_241
+      nextln:   jump addr_0_block_244(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_244(v1277: i52, v1278: int, v1279: bool, v1280: bool): // preds: addr_0_block_243
+      nextln:   v1281 = i52.trunc.i64 v1120
+      nextln:   jump addr_0_block_245(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1281, 0x1, 0x0)
+      check: addr_0_block_245(v1130: i3, v1131: i1, v1132: i1, v1133: i1, v1134: i1, v1135: i4, v1136: i1, v1137: bool, v1138: int, v1139: int, v1140: bool, v1141: bool, v1142: i8, v1143: i8, v1144: i52, v1145: i1, v1146: bool, v1147: bool, v1148: int, v1149: i1, v1150: bool, v1151: i4, v1152: i2, v1153: i4, v1154: i8, v1155: i8, v1156: i2, v1157: i2, v1158: bool, v1159: i2, v1160: i2, v1161: bool, v1162: bool, v1163: bool, v1164: bool, v1165: i52, v1166: i1, v1167: i64, v1168: i1, v1169: i8, v1170: i8, v1171: i52, v1172: i1, v1173: bool, v1174: bool, v1175: int, v1176: i1, v1177: bool, v1178: i4, v1179: i2, v1180: i4, v1181: i8, v1182: i8, v1183: i2, v1184: i2, v1185: bool, v1186: i2, v1187: i2, v1188: bool, v1189: bool, v1190: bool, v1191: bool, v1192: i52, v1193: i1, v1194: i64): // preds: addr_0_block_242 addr_0_block_244
+      nextln:   v1195 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1196 = bool.bitwise_not v1195
+      nextln:   v1197 = bool.bitwise_not v5
+      nextln:   v1198 = bool.and v1197, 0x1
+      nextln:   v1199 = bool.or v1198, 0x0
+      nextln:   v1200 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1201 = bool.bitwise_not v1200
+      nextln:   v1202 = bool.and v1199, v1201
+      nextln:   v1203 = bool.icmp.i8.eq v1181, 0x1
+      nextln:   v1204 = bool.and v1202, v1203
+      nextln:   jumpif v1204, addr_0_block_246, addr_0_block_247
+      check: addr_0_block_246: // preds: addr_0_block_245
+      nextln:   jump addr_0_block_248
+      check: addr_0_block_247: // preds: addr_0_block_245
+      nextln:   jump addr_0_block_248
+      check: addr_0_block_248: // preds: addr_0_block_246 addr_0_block_247
+      nextln:   v1205 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1206 = bool.bitwise_not v1205
+      nextln:   v1207 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1208 = bool.bitwise_not v1207
+      nextln:   v1209 = bool.icmp.i8.eq v1181, 0x1
+      nextln:   v1210 = bool.and v1208, v1209
+      nextln:   jumpif v1140, addr_0_block_249, addr_0_block_250
+      check: addr_0_block_249: // preds: addr_0_block_248
+      nextln:   v1211 = bool.icmp.i8.eq v1169, 0x0
+      nextln:   jump addr_0_block_251(0x1)
+      check: addr_0_block_250: // preds: addr_0_block_248
+      nextln:   jump addr_0_block_251(0x0)
+      check: addr_0_block_251(v1212: bool): // preds: addr_0_block_249 addr_0_block_250
+      nextln:   v1213 = bool.icmp.i8.eq v1169, 0x0
+      nextln:   v1214 = bool.and v1141, v1213
+      nextln:   jumpif v1214, addr_0_block_252, addr_0_block_253
+      check: addr_0_block_252: // preds: addr_0_block_251
+      nextln:   jump addr_0_block_254(0x0, 0x0)
+      check: addr_0_block_253: // preds: addr_0_block_251
+      nextln:   jump addr_0_block_254(0x0, 0x0)
+      check: addr_0_block_254(v1215: bool, v1216: bool): // preds: addr_0_block_252 addr_0_block_253
+      nextln:   v1217 = bool.or v1212, v1215
+      nextln:   jumpif v1217, addr_0_block_255, addr_0_block_268
+      check: addr_0_block_255: // preds: addr_0_block_254
+      nextln:   v1218 = i52.unsigned_from_bits v1165
+      nextln:   v1219 = int.modulo v1218, 0x8
+      nextln:   v1220 = int.sub v1218, v1219
+      nextln:   v1221 = i52.to_bits v1220
+      nextln:   v1222 = bool.icmp.i52.eq v1165, v1221
+      nextln:   v1223 = i64.load v1165
+      nextln:   jumpif v1212, addr_0_block_256, addr_0_block_257
+      nextln:   jump addr_0_block_269(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v1223, v1142, v1143, v1144, v1145, v1146, v1147, v1148, v1149, v1150, v1151, v1152, v1153, v1154, v1155, v1156, v1157, v1158, v1159, v1160, v1161, v1162, v1163, v1164, v1165, v1166, v1167, 0x0, 0x0)
+      check: addr_0_block_256: // no preds!
+      nextln:   jump addr_0_block_258
+      check: addr_0_block_257: // no preds!
+      nextln:   jump addr_0_block_258
+      check: addr_0_block_258: // preds: addr_0_block_256 addr_0_block_257
+      nextln:   jumpif v1215, addr_0_block_259, addr_0_block_260
+      check: addr_0_block_259: // preds: addr_0_block_258
+      nextln:   jump addr_0_block_261
+      check: addr_0_block_260: // preds: addr_0_block_258
+      nextln:   jump addr_0_block_261
+      check: addr_0_block_261: // preds: addr_0_block_259 addr_0_block_260
+      nextln:   v1387 = i52.unsigned_from_bits v1165
+      nextln:   v1388 = int.modulo v1387, 0x8
+      nextln:   v1389 = int.sub v1387, v1388
+      nextln:   v1390 = i52.to_bits v1389
+      nextln:   v1391 = bool.icmp.i52.eq v1165, v1390
+      nextln:   v1392 = bool.icmp.i52.eq v1165, 0x13000000
+      nextln:   jumpif v1392, addr_0_block_262, addr_0_block_266
+      check: addr_0_block_262: // preds: addr_0_block_261
+      nextln:   v1393 = i64.unsigned_from_bits v1223
+      nextln:   v1394 = bool.icmp.int.eq v1393, 0x4
+      nextln:   jumpif v1394, addr_0_block_263, addr_0_block_264
+      nextln:   jump addr_0_block_267
+      check: addr_0_block_263: // no preds!
+      nextln:   jump addr_0_block_265
+      check: addr_0_block_264: // no preds!
+      nextln:   v1395 = i8.trunc.i64 v1223
+      nextln:   v1396 = i8.unsigned_from_bits v1395
+      nextln:   jump addr_0_block_265
+      check: addr_0_block_265: // preds: addr_0_block_263 addr_0_block_264
+      check: addr_0_block_266: // preds: addr_0_block_261
+      nextln:   store.i64 v1223, v1165
+      nextln:   jump addr_0_block_267
+      check: addr_0_block_267: // preds: addr_0_block_262 addr_0_block_266
+      check: addr_0_block_268: // preds: addr_0_block_254
+      nextln:   jump addr_0_block_269(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_269(v1224: i8, v1225: i1, v1226: i16, v1227: i8, v1228: bool, v1229: bool, v1230: bool, v1231: int, v1232: i64, v1233: i8, v1234: i8, v1235: i52, v1236: i1, v1237: bool, v1238: bool, v1239: int, v1240: i1, v1241: bool, v1242: i4, v1243: i2, v1244: i4, v1245: i8, v1246: i8, v1247: i2, v1248: i2, v1249: bool, v1250: i2, v1251: i2, v1252: bool, v1253: bool, v1254: bool, v1255: bool, v1256: i52, v1257: i1, v1258: i64, v1259: i2, v1260: bool): // preds: addr_0_block_255 addr_0_block_268
+      nextln:   v1261 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1262 = bool.bitwise_not v1261
+      nextln:   v1263 = bool.and v1262, 0x1
+      nextln:   v1264 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   v1265 = bool.bitwise_not v1264
+      nextln:   v1266 = bool.and 0x1, v1265
+      nextln:   jumpif v1266, addr_0_block_270, addr_0_block_271
+      check: addr_0_block_270: // preds: addr_0_block_269
+      nextln:   jump addr_0_block_272
+      check: addr_0_block_271: // preds: addr_0_block_269
+      nextln:   jump addr_0_block_272
+      check: addr_0_block_272: // preds: addr_0_block_270 addr_0_block_271
+      nextln:   v1267 = bool.icmp.i8.ne v1169, 0x0
+      nextln:   jumpif v1267, addr_0_block_273, addr_0_block_274
+      check: addr_0_block_273: // preds: addr_0_block_272
+      nextln:   jump addr_0_block_275
+      check: addr_0_block_274: // preds: addr_0_block_272
+      nextln:   jump addr_0_block_275
+      check: addr_0_block_275: // preds: addr_0_block_273 addr_0_block_274
+      nextln:   v1268 = i52.unsigned_from_bits v1192
+      nextln:   v1269 = int.modulo v1268, 0x1
+      nextln:   v1270 = int.sub v1268, v1269
+      nextln:   v1271 = i52.to_bits v1270
+      nextln:   v1272 = bool.icmp.i52.eq v1192, v1271
+      nextln:   v1273 = i8.load v1192
+      nextln:   v1274 = i64.and v1119, 0xffffffffffffff
+      nextln:   v1275 = i8.lshl v1273, 0x38
+      nextln:   v1276 = i64.or v1274, v1275
+      check: addr_0_block_276: // preds: entry
+      nextln:   v21 = i64.unsigned_from_bits v0
+      nextln:   v22 = int.modulo v21, 0x8
+      nextln:   v23 = int.sub v21, v22
+      nextln:   v24 = i64.to_bits v23
+      nextln:   v25 = bool.icmp.i64.eq v0, v24
+      nextln:   v26 = i64.lshr v0, 0x30
+      nextln:   v27 = i16.trunc.i64 v26
+      nextln:   v28 = bool.icmp.i16.eq v27, 0x0
+      nextln:   v29 = bool.bitwise_not v28
+      nextln:   jumpif v29, addr_0_block_277, addr_0_block_278
+      nextln:   jump addr_0_block_311(v5, 0x0, v1540)
+      check: addr_0_block_277: // no preds!
+      nextln:   jump addr_0_block_279(0x0, 0x0, 0x0, 0x0)
+      nextln:   jump addr_0_block_280(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x7, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_278: // no preds!
+      nextln:   jump addr_0_block_279(0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_279(v1541: i52, v1542: int, v1543: bool, v1544: bool): // preds: addr_0_block_278
+      nextln:   v1545 = i52.trunc.i64 v0
+      nextln:   jump addr_0_block_280(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, v1545, 0x1, 0x0)
+      check: addr_0_block_280(v1397: i3, v1398: i1, v1399: i1, v1400: i1, v1401: i1, v1402: i4, v1403: i1, v1404: bool, v1405: int, v1406: int, v1407: bool, v1408: bool, v1409: i8, v1410: i8, v1411: i52, v1412: i1, v1413: bool, v1414: bool, v1415: int, v1416: i1, v1417: bool, v1418: i4, v1419: i2, v1420: i4, v1421: i8, v1422: i8, v1423: i2, v1424: i2, v1425: bool, v1426: i2, v1427: i2, v1428: bool, v1429: bool, v1430: bool, v1431: bool, v1432: i52, v1433: i1, v1434: i64, v1435: i1, v1436: i8, v1437: i8, v1438: i52, v1439: i1, v1440: bool, v1441: bool, v1442: int, v1443: i1, v1444: bool, v1445: i4, v1446: i2, v1447: i4, v1448: i8, v1449: i8, v1450: i2, v1451: i2, v1452: bool, v1453: i2, v1454: i2, v1455: bool, v1456: bool, v1457: bool, v1458: bool, v1459: i52, v1460: i1, v1461: i64): // preds: addr_0_block_277 addr_0_block_279
+      nextln:   v1462 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1463 = bool.bitwise_not v1462
+      nextln:   v1464 = bool.bitwise_not v5
+      nextln:   v1465 = bool.and v1464, 0x1
+      nextln:   v1466 = bool.or v1465, 0x0
+      nextln:   v1467 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1468 = bool.bitwise_not v1467
+      nextln:   v1469 = bool.and v1466, v1468
+      nextln:   v1470 = bool.icmp.i8.eq v1448, 0x1
+      nextln:   v1471 = bool.and v1469, v1470
+      nextln:   jumpif v1471, addr_0_block_281, addr_0_block_282
+      check: addr_0_block_281: // preds: addr_0_block_280
+      nextln:   jump addr_0_block_283
+      check: addr_0_block_282: // preds: addr_0_block_280
+      nextln:   jump addr_0_block_283
+      check: addr_0_block_283: // preds: addr_0_block_281 addr_0_block_282
+      nextln:   v1472 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1473 = bool.bitwise_not v1472
+      nextln:   v1474 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1475 = bool.bitwise_not v1474
+      nextln:   v1476 = bool.icmp.i8.eq v1448, 0x1
+      nextln:   v1477 = bool.and v1475, v1476
+      nextln:   jumpif v1407, addr_0_block_284, addr_0_block_285
+      check: addr_0_block_284: // preds: addr_0_block_283
+      nextln:   v1478 = bool.icmp.i8.eq v1436, 0x0
+      nextln:   jump addr_0_block_286(0x1)
+      check: addr_0_block_285: // preds: addr_0_block_283
+      nextln:   jump addr_0_block_286(0x0)
+      check: addr_0_block_286(v1479: bool): // preds: addr_0_block_284 addr_0_block_285
+      nextln:   v1480 = bool.icmp.i8.eq v1436, 0x0
+      nextln:   v1481 = bool.and v1408, v1480
+      nextln:   jumpif v1481, addr_0_block_287, addr_0_block_288
+      check: addr_0_block_287: // preds: addr_0_block_286
+      nextln:   jump addr_0_block_289(0x0, 0x0)
+      check: addr_0_block_288: // preds: addr_0_block_286
+      nextln:   jump addr_0_block_289(0x0, 0x0)
+      check: addr_0_block_289(v1482: bool, v1483: bool): // preds: addr_0_block_287 addr_0_block_288
+      nextln:   v1484 = bool.or v1479, v1482
+      nextln:   jumpif v1484, addr_0_block_290, addr_0_block_303
+      check: addr_0_block_290: // preds: addr_0_block_289
+      nextln:   v1485 = i52.unsigned_from_bits v1432
+      nextln:   v1486 = int.modulo v1485, 0x8
+      nextln:   v1487 = int.sub v1485, v1486
+      nextln:   v1488 = i52.to_bits v1487
+      nextln:   v1489 = bool.icmp.i52.eq v1432, v1488
+      nextln:   v1490 = i64.load v1432
+      nextln:   jumpif v1479, addr_0_block_291, addr_0_block_292
+      nextln:   jump addr_0_block_304(0x5, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, v1490, v1409, v1410, v1411, v1412, v1413, v1414, v1415, v1416, v1417, v1418, v1419, v1420, v1421, v1422, v1423, v1424, v1425, v1426, v1427, v1428, v1429, v1430, v1431, v1432, v1433, v1434, 0x0, 0x0)
+      check: addr_0_block_291: // no preds!
+      nextln:   jump addr_0_block_293
+      check: addr_0_block_292: // no preds!
+      nextln:   jump addr_0_block_293
+      check: addr_0_block_293: // preds: addr_0_block_291 addr_0_block_292
+      nextln:   jumpif v1482, addr_0_block_294, addr_0_block_295
+      check: addr_0_block_294: // preds: addr_0_block_293
+      nextln:   jump addr_0_block_296
+      check: addr_0_block_295: // preds: addr_0_block_293
+      nextln:   jump addr_0_block_296
+      check: addr_0_block_296: // preds: addr_0_block_294 addr_0_block_295
+      nextln:   v1546 = i52.unsigned_from_bits v1432
+      nextln:   v1547 = int.modulo v1546, 0x8
+      nextln:   v1548 = int.sub v1546, v1547
+      nextln:   v1549 = i52.to_bits v1548
+      nextln:   v1550 = bool.icmp.i52.eq v1432, v1549
+      nextln:   v1551 = bool.icmp.i52.eq v1432, 0x13000000
+      nextln:   jumpif v1551, addr_0_block_297, addr_0_block_301
+      check: addr_0_block_297: // preds: addr_0_block_296
+      nextln:   v1552 = i64.unsigned_from_bits v1490
+      nextln:   v1553 = bool.icmp.int.eq v1552, 0x4
+      nextln:   jumpif v1553, addr_0_block_298, addr_0_block_299
+      nextln:   jump addr_0_block_302
+      check: addr_0_block_298: // no preds!
+      nextln:   jump addr_0_block_300
+      check: addr_0_block_299: // no preds!
+      nextln:   v1554 = i8.trunc.i64 v1490
+      nextln:   v1555 = i8.unsigned_from_bits v1554
+      nextln:   jump addr_0_block_300
+      check: addr_0_block_300: // preds: addr_0_block_298 addr_0_block_299
+      check: addr_0_block_301: // preds: addr_0_block_296
+      nextln:   store.i64 v1490, v1432
+      nextln:   jump addr_0_block_302
+      check: addr_0_block_302: // preds: addr_0_block_297 addr_0_block_301
+      check: addr_0_block_303: // preds: addr_0_block_289
+      nextln:   jump addr_0_block_304(0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
+      check: addr_0_block_304(v1491: i8, v1492: i1, v1493: i16, v1494: i8, v1495: bool, v1496: bool, v1497: bool, v1498: int, v1499: i64, v1500: i8, v1501: i8, v1502: i52, v1503: i1, v1504: bool, v1505: bool, v1506: int, v1507: i1, v1508: bool, v1509: i4, v1510: i2, v1511: i4, v1512: i8, v1513: i8, v1514: i2, v1515: i2, v1516: bool, v1517: i2, v1518: i2, v1519: bool, v1520: bool, v1521: bool, v1522: bool, v1523: i52, v1524: i1, v1525: i64, v1526: i2, v1527: bool): // preds: addr_0_block_290 addr_0_block_303
+      nextln:   v1528 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1529 = bool.bitwise_not v1528
+      nextln:   v1530 = bool.and v1529, 0x1
+      nextln:   v1531 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   v1532 = bool.bitwise_not v1531
+      nextln:   v1533 = bool.and 0x1, v1532
+      nextln:   jumpif v1533, addr_0_block_305, addr_0_block_306
+      check: addr_0_block_305: // preds: addr_0_block_304
+      nextln:   jump addr_0_block_307
+      check: addr_0_block_306: // preds: addr_0_block_304
+      nextln:   jump addr_0_block_307
+      check: addr_0_block_307: // preds: addr_0_block_305 addr_0_block_306
+      nextln:   v1534 = bool.icmp.i8.ne v1436, 0x0
+      nextln:   jumpif v1534, addr_0_block_308, addr_0_block_309
+      check: addr_0_block_308: // preds: addr_0_block_307
+      nextln:   jump addr_0_block_310
+      check: addr_0_block_309: // preds: addr_0_block_307
+      nextln:   jump addr_0_block_310
+      check: addr_0_block_310: // preds: addr_0_block_308 addr_0_block_309
+      nextln:   v1535 = i52.unsigned_from_bits v1459
+      nextln:   v1536 = int.modulo v1535, 0x8
+      nextln:   v1537 = int.sub v1535, v1536
+      nextln:   v1538 = i52.to_bits v1537
+      nextln:   v1539 = bool.icmp.i52.eq v1459, v1538
+      nextln:   v1540 = i64.load v1459
+      check: addr_0_block_311(v17: i64, v18: i8, v19: i64): // preds: addr_0_block_0 addr_0_block_276
+      nextln:   write_reg.i64 v19, "x0"
+      nextln:   v20 = i64.wrapping_add v0, 0x4
+      nextln:   write_reg.i64 v20, "x2"

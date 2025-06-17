@@ -1,0 +1,31 @@
+tests:
+- name: simd_scalar
+  bytes: [0x41, 0x84, 0xe3, 0x5e]
+  directives: |
+      check: entry: // entry block; no preds!
+- name: simd_vector
+  bytes: [0x20, 0x84, 0xa2, 0x4e]
+  directives: |
+      check: entry: // entry block; no preds!
+- name: simd_vector_2
+  bytes: [0x20, 0x84, 0x22, 0x0e]
+  directives: |
+      check: entry: // entry block; no preds!
+- name: simd_mov_to_scalar
+  bytes: [0x20, 0x00, 0x67, 0x9e, 0x41, 0x00, 0x67, 0x9e, 0x02, 0x84, 0xe1, 0x4e, 0x48, 0x3c, 0x08, 0x4e]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.opaque
+      nextln:   write_reg.i64 v0, "x0"
+      nextln:   v1 = i64.opaque
+      nextln:   write_reg.i64 v1, "x0"
+      nextln:   v2 = i64.opaque
+      nextln:   write_reg.i64 v2, "x0"
+      nextln:   v3 = i64.opaque
+      nextln:   write_reg.i64 v3, "x1"
+      nextln:   v4 = i64.opaque
+      nextln:   write_reg.i64 v4, "x1"
+      nextln:   v5 = i64.opaque
+      nextln:   write_reg.i64 v5, "x1"
+      nextln:   v6 = i64.opaque
+      nextln:   write_reg.i64 v6, "x8"

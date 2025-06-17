@@ -1,0 +1,43 @@
+tests:
+- name: udiv_1
+  bytes: [0x41, 0x08, 0xc3, 0x1a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i64.read_reg "x3"
+      nextln:   v3 = i32.trunc.i64 v2
+      nextln:   v4 = bool.icmp.i32.eq v3, 0x0
+      nextln:   jumpif v4, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v11 = i32.unsigned_from_bits v1
+      nextln:   v12 = i32.unsigned_from_bits v3
+      nextln:   v13 = int.div v11, v12
+      nextln:   jump addr_0_block_2(v13)
+      check: addr_0_block_2(v5: int): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v6 = i32.to_bits v5
+      nextln:   v7 = i64.zext.i32 0x0
+      nextln:   v8 = i64.lshl v7, 0x20
+      nextln:   v9 = i64.zext.i32 v6
+      nextln:   v10 = i64.or v8, v9
+      nextln:   write_reg.i64 v10, "x1"
+- name: udiv_2
+  bytes: [0x41, 0x08, 0xc3, 0x9a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i64.read_reg "x3"
+      nextln:   v2 = bool.icmp.i64.eq v1, 0x0
+      nextln:   jumpif v2, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v5 = i64.unsigned_from_bits v0
+      nextln:   v6 = i64.unsigned_from_bits v1
+      nextln:   v7 = int.div v5, v6
+      nextln:   jump addr_0_block_2(v7)
+      check: addr_0_block_2(v3: int): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v4 = i64.to_bits v3
+      nextln:   write_reg.i64 v4, "x1"

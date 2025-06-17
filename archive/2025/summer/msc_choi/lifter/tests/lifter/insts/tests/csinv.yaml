@@ -1,0 +1,58 @@
+tests:
+- name: csinv_1
+  bytes: [0x41, 0xa0, 0x83, 0x5a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i64.read_reg "x3"
+      nextln:   v3 = i32.trunc.i64 v2
+      nextln:   v4 = i1.read_reg "n"
+      nextln:   v5 = i1.read_reg "v"
+      nextln:   v6 = bool.icmp.i1.eq v4, v5
+      nextln:   jumpif v6, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(v1)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v12 = i32.bitwise_not v3
+      nextln:   jump addr_0_block_2(v12)
+      check: addr_0_block_2(v7: i32): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v8 = i64.zext.i32 0x0
+      nextln:   v9 = i64.lshl v8, 0x20
+      nextln:   v10 = i64.zext.i32 v7
+      nextln:   v11 = i64.or v9, v10
+      nextln:   write_reg.i64 v11, "x1"
+- name: csinv_2
+  bytes: [0x41, 0xa0, 0x83, 0xda]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i64.read_reg "x3"
+      nextln:   v2 = i1.read_reg "n"
+      nextln:   v3 = i1.read_reg "v"
+      nextln:   v4 = bool.icmp.i1.eq v2, v3
+      nextln:   jumpif v4, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(v0)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v6 = i64.bitwise_not v1
+      nextln:   jump addr_0_block_2(v6)
+      check: addr_0_block_2(v5: i64): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   write_reg.i64 v5, "x1"
+- name: csinv_3
+  bytes: [0x21, 0x30, 0x82, 0xda]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i64.read_reg "x2"
+      nextln:   v2 = i1.read_reg "c"
+      nextln:   v3 = bool.icmp.i1.eq v2, 0x1
+      nextln:   v4 = bool.bitwise_not v3
+      nextln:   jumpif v4, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(v0)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v6 = i64.bitwise_not v1
+      nextln:   jump addr_0_block_2(v6)
+      check: addr_0_block_2(v5: i64): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   write_reg.i64 v5, "x1"

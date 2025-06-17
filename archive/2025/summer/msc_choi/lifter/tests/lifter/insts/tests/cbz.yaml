@@ -1,0 +1,48 @@
+tests:
+- name: cbz_1
+  bytes: [0x00, 0x00, 0x00, 0x34]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   jump addr_0
+      check: addr_0: // preds: entry
+      nextln:   v0 = i64.read_reg "x0"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = bool.icmp.i32.eq v1, 0x0
+      nextln:   v3 = bool.icmp.bool.eq v2, 0x1
+      nextln:   jumpif v3, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: addr_0
+      nextln:   jump addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+- name: cbz_2
+  bytes: [0x20, 0x00, 0x00, 0xb4]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x0"
+      nextln:   v1 = bool.icmp.i64.eq v0, 0x0
+      nextln:   v2 = bool.icmp.bool.eq v1, 0x1
+      nextln:   jumpif v2, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_4
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_4: // no preds!
+- name: cbz_3
+  bytes: [0xc1, 0xff, 0xff, 0xb4]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = bool.icmp.i64.eq v0, 0x0
+      nextln:   v2 = bool.icmp.bool.eq v1, 0x1
+      nextln:   jumpif v2, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_18446744073709551608
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_18446744073709551608: // no preds!

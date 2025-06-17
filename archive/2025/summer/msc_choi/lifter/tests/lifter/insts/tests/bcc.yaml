@@ -1,0 +1,32 @@
+tests:
+- name: bcc_1
+  bytes: [0x00, 0x00, 0x00, 0x54]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   jump addr_0
+      check: addr_0: // preds: entry
+      nextln:   v0 = i1.read_reg "z"
+      nextln:   v1 = bool.icmp.i1.eq v0, 0x1
+      nextln:   jumpif v1, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: addr_0
+      nextln:   jump addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+- name: bcc_2
+  bytes: [0x07, 0x00, 0x00, 0x54]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   jump addr_0
+      check: addr_0: // preds: entry
+      nextln:   v0 = i1.read_reg "v"
+      nextln:   v1 = bool.icmp.i1.eq v0, 0x1
+      nextln:   v2 = bool.bitwise_not v1
+      nextln:   jumpif v2, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: addr_0
+      nextln:   jump addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: addr_0
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1

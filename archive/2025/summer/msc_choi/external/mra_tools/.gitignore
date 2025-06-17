@@ -1,0 +1,13 @@
+# tarballs
+
+*.tar.gz
+
+# ASL files
+regs.asl
+arch.asl
+arch.tag
+
+# Vim files
+*.swp
+*.un~
+*.swo

@@ -1,0 +1,14 @@
+tests:
+- name: smulh_1
+  bytes: [0x41, 0x7c, 0x43, 0x9b]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i64.read_reg "x3"
+      nextln:   v2 = i64.signed_from_bits v0
+      nextln:   v3 = i64.signed_from_bits v1
+      nextln:   v4 = int.mul v2, v3
+      nextln:   v5 = i128.to_bits v4
+      nextln:   v6 = i128.lshr v5, 0x40
+      nextln:   v7 = i64.trunc.i128 v6
+      nextln:   write_reg.i64 v7, "x1"

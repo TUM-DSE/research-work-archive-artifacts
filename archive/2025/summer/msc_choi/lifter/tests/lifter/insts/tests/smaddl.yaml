@@ -1,0 +1,17 @@
+tests:
+- name: smaddl_1
+  bytes: [0x20, 0x00, 0x22, 0x9b]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i64.read_reg "x2"
+      nextln:   v3 = i32.trunc.i64 v2
+      nextln:   v4 = i64.read_reg "x0"
+      nextln:   v5 = i64.signed_from_bits v4
+      nextln:   v6 = i32.signed_from_bits v1
+      nextln:   v7 = i32.signed_from_bits v3
+      nextln:   v8 = int.mul v6, v7
+      nextln:   v9 = int.add v5, v8
+      nextln:   v10 = i64.to_bits v9
+      nextln:   write_reg.i64 v10, "x0"

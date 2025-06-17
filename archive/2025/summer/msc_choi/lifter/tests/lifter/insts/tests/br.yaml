@@ -1,0 +1,7 @@
+tests:
+- name: br_1
+  bytes: [0x20, 0x00, 0x1f, 0xd6]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   dynamic_jump v0

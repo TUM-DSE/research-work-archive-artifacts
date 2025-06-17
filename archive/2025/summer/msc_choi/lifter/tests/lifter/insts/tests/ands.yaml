@@ -1,0 +1,37 @@
+tests:
+- name: ands_1
+  bytes: [0x21, 0x00, 0x02, 0xea]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i64.read_reg "x2"
+      nextln:   v2 = i64.and v0, v1
+      nextln:   v3 = i64.lshr v2, 0x3f
+      nextln:   v4 = i1.trunc.i64 v3
+      nextln:   v5 = bool.icmp.i64.eq v2, 0x0
+      nextln:   jumpif v5, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x1)
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_2(v6: i1): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v7 = i2.zext.i1 v4
+      nextln:   v8 = i2.lshl v7, 0x1
+      nextln:   v9 = i2.zext.i1 v6
+      nextln:   v10 = i2.or v8, v9
+      nextln:   v11 = i4.zext.i2 v10
+      nextln:   v12 = i4.lshl v11, 0x2
+      nextln:   v13 = i4.zext.i2 0x0
+      nextln:   v14 = i4.or v12, v13
+      nextln:   v15 = i1.trunc.i4 v14
+      nextln:   write_reg.i1 v15, "v"
+      nextln:   v16 = i4.lshr v14, 0x1
+      nextln:   v17 = i1.trunc.i4 v16
+      nextln:   write_reg.i1 v17, "c"
+      nextln:   v18 = i4.lshr v14, 0x2
+      nextln:   v19 = i1.trunc.i4 v18
+      nextln:   write_reg.i1 v19, "z"
+      nextln:   v20 = i4.lshr v14, 0x3
+      nextln:   v21 = i1.trunc.i4 v20
+      nextln:   write_reg.i1 v21, "n"
+      nextln:   write_reg.i64 v2, "x1"

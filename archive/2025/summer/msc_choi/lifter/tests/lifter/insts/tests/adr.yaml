@@ -1,0 +1,16 @@
+tests:
+- name: adr_1
+  bytes: [0x00, 0x00, 0x00, 0x10]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x0, "x0"
+- name: adr_2
+  bytes: [0x21, 0x00, 0x00, 0x10]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x4, "x1"
+- name: adr_3
+  bytes: [0xc0, 0xff, 0xff, 0x10]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0xfffffffffffffff8, "x0"
