@@ -1,0 +1,22 @@
+tests:
+- name: bl_1
+  bytes: [0x02, 0x00, 0x00, 0x94]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x4, "x30"
+      nextln:   jump addr_8
+      check: addr_8: // preds: entry
+- name: bl_2
+  bytes: [0x01, 0x00, 0x00, 0x94]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x4, "x30"
+      nextln:   jump addr_4
+      check: addr_4: // preds: entry
+- name: bl_3
+  bytes: [0xfe, 0xff, 0xff, 0x97]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x4, "x30"
+      nextln:   jump addr_18446744073709551608
+      check: addr_18446744073709551608: // preds: entry

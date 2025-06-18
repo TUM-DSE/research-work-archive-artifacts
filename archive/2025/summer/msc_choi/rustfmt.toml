@@ -1,0 +1,5 @@
+ignore = [
+    "lifter/src/arm64/common/generated",
+    "lifter/src/arm64/decode/generated",
+    "lifter/src/arm64/lift/generated",
+]

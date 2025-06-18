@@ -1,0 +1,67 @@
+tests:
+- name: tbnz_1
+  bytes: [0x80, 0x80, 0x40, 0xb7]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x0"
+      nextln:   v1 = i64.lshr v0, 0x28
+      nextln:   v2 = i1.trunc.i64 v1
+      nextln:   v3 = bool.icmp.i1.eq v2, 0x1
+      nextln:   jumpif v3, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_4112
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_4112: // no preds!
+- name: tbnz_2
+  bytes: [0xe1, 0xff, 0x67, 0x37]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i32.lshr v1, 0xc
+      nextln:   v3 = i1.trunc.i32 v2
+      nextln:   v4 = bool.icmp.i1.eq v3, 0x1
+      nextln:   jumpif v4, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_18446744073709551612
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_18446744073709551612: // no preds!
+- name: tbnz_3
+  bytes: [0xc1, 0xff, 0x0f, 0x37]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i32.lshr v1, 0x1
+      nextln:   v3 = i1.trunc.i32 v2
+      nextln:   v4 = bool.icmp.i1.eq v3, 0x1
+      nextln:   jumpif v4, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_18446744073709551608
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_18446744073709551608: // no preds!
+- name: tbnz_4
+  bytes: [0xa2, 0xff, 0x07, 0x37]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i1.trunc.i32 v1
+      nextln:   v3 = bool.icmp.i1.eq v2, 0x1
+      nextln:   jumpif v3, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_18446744073709551604
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2
+      check: addr_0_block_2: // preds: addr_0_block_0 addr_0_block_1
+      check: addr_18446744073709551604: // no preds!

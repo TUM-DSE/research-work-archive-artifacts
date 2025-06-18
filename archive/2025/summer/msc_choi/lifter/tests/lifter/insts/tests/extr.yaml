@@ -1,0 +1,46 @@
+tests:
+- name: extr_1
+  bytes: [0x20, 0x30, 0xc2, 0x93]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i64.read_reg "x2"
+      nextln:   v2 = i128.zext.i64 v0
+      nextln:   v3 = i128.lshl v2, 0x40
+      nextln:   v4 = i128.zext.i64 v1
+      nextln:   v5 = i128.or v3, v4
+      nextln:   v6 = i128.lshr v5, 0xc
+      nextln:   v7 = i64.trunc.i128 v6
+      nextln:   write_reg.i64 v7, "x0"
+- name: extr_2
+  bytes: [0x00, 0xc8, 0xc0, 0x93]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x0"
+      nextln:   v1 = i64.read_reg "x0"
+      nextln:   v2 = i128.zext.i64 v0
+      nextln:   v3 = i128.lshl v2, 0x40
+      nextln:   v4 = i128.zext.i64 v1
+      nextln:   v5 = i128.or v3, v4
+      nextln:   v6 = i128.lshr v5, 0x32
+      nextln:   v7 = i64.trunc.i128 v6
+      nextln:   write_reg.i64 v7, "x0"
+- name: extr_3
+  bytes: [0x41, 0x0c, 0x83, 0x13]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i64.read_reg "x3"
+      nextln:   v3 = i32.trunc.i64 v2
+      nextln:   v4 = i64.zext.i32 v1
+      nextln:   v5 = i64.lshl v4, 0x20
+      nextln:   v6 = i64.zext.i32 v3
+      nextln:   v7 = i64.or v5, v6
+      nextln:   v8 = i64.lshr v7, 0x3
+      nextln:   v9 = i32.trunc.i64 v8
+      nextln:   v10 = i64.zext.i32 0x0
+      nextln:   v11 = i64.lshl v10, 0x20
+      nextln:   v12 = i64.zext.i32 v9
+      nextln:   v13 = i64.or v11, v12
+      nextln:   write_reg.i64 v13, "x1"

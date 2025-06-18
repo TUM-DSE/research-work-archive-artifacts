@@ -1,0 +1,101 @@
+tests:
+- name: rorv_1
+  bytes: [0x21, 0x2c, 0xc2, 0x9a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i64.unsigned_from_bits v0
+      nextln:   v2 = int.modulo v1, 0x40
+      nextln:   v3 = i64.read_reg "x1"
+      nextln:   v4 = bool.icmp.int.ge v2, 0x0
+      nextln:   v5 = bool.icmp.int.eq v2, 0x0
+      nextln:   jumpif v5, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_8(v3)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v7 = bool.icmp.int.ne v2, 0x0
+      nextln:   v8 = int.modulo v2, 0x40
+      nextln:   v9 = bool.icmp.int.ge v8, 0x0
+      nextln:   v10 = bool.icmp.int.eq v8, 0x0
+      nextln:   jumpif v10, addr_0_block_2, addr_0_block_3
+      nextln:   jump addr_0_block_8(v16)
+      check: addr_0_block_2: // no preds!
+      nextln:   jump addr_0_block_4(v3)
+      check: addr_0_block_3: // no preds!
+      nextln:   v23 = i64.lshr v3, v8
+      nextln:   v24 = int.sub v8, 0x1
+      nextln:   v25 = i64.lshr v3, v24
+      nextln:   v26 = i1.trunc.i64 v25
+      nextln:   jump addr_0_block_4(v23)
+      check: addr_0_block_4(v11: i64): // preds: addr_0_block_2 addr_0_block_3
+      nextln:   v12 = int.sub 0x40, v8
+      nextln:   v13 = bool.icmp.int.ge v12, 0x0
+      nextln:   v14 = bool.icmp.int.eq v12, 0x0
+      nextln:   jumpif v14, addr_0_block_5, addr_0_block_6
+      check: addr_0_block_5: // preds: addr_0_block_4
+      nextln:   jump addr_0_block_7(v3)
+      check: addr_0_block_6: // preds: addr_0_block_4
+      nextln:   v19 = i64.lshl v3, v12
+      nextln:   v20 = int.sub 0x40, v12
+      nextln:   v21 = i64.lshr v3, v20
+      nextln:   v22 = i1.trunc.i64 v21
+      nextln:   jump addr_0_block_7(v19)
+      check: addr_0_block_7(v15: i64): // preds: addr_0_block_5 addr_0_block_6
+      nextln:   v16 = i64.or v11, v15
+      nextln:   v17 = i64.lshr v16, 0x3f
+      nextln:   v18 = i1.trunc.i64 v17
+      check: addr_0_block_8(v6: i64): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   write_reg.i64 v6, "x1"
+- name: rorv_2
+  bytes: [0x21, 0x2c, 0xc2, 0x1a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x2"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i32.unsigned_from_bits v1
+      nextln:   v3 = int.modulo v2, 0x20
+      nextln:   v4 = i64.read_reg "x1"
+      nextln:   v5 = i32.trunc.i64 v4
+      nextln:   v6 = bool.icmp.int.ge v3, 0x0
+      nextln:   v7 = bool.icmp.int.eq v3, 0x0
+      nextln:   jumpif v7, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_8(v5)
+      check: addr_0_block_1: // preds: entry
+      nextln:   v13 = bool.icmp.int.ne v3, 0x0
+      nextln:   v14 = int.modulo v3, 0x20
+      nextln:   v15 = bool.icmp.int.ge v14, 0x0
+      nextln:   v16 = bool.icmp.int.eq v14, 0x0
+      nextln:   jumpif v16, addr_0_block_2, addr_0_block_3
+      nextln:   jump addr_0_block_8(v22)
+      check: addr_0_block_2: // no preds!
+      nextln:   jump addr_0_block_4(v5)
+      check: addr_0_block_3: // no preds!
+      nextln:   v29 = i32.lshr v5, v14
+      nextln:   v30 = int.sub v14, 0x1
+      nextln:   v31 = i32.lshr v5, v30
+      nextln:   v32 = i1.trunc.i32 v31
+      nextln:   jump addr_0_block_4(v29)
+      check: addr_0_block_4(v17: i32): // preds: addr_0_block_2 addr_0_block_3
+      nextln:   v18 = int.sub 0x20, v14
+      nextln:   v19 = bool.icmp.int.ge v18, 0x0
+      nextln:   v20 = bool.icmp.int.eq v18, 0x0
+      nextln:   jumpif v20, addr_0_block_5, addr_0_block_6
+      check: addr_0_block_5: // preds: addr_0_block_4
+      nextln:   jump addr_0_block_7(v5)
+      check: addr_0_block_6: // preds: addr_0_block_4
+      nextln:   v25 = i32.lshl v5, v18
+      nextln:   v26 = int.sub 0x20, v18
+      nextln:   v27 = i32.lshr v5, v26
+      nextln:   v28 = i1.trunc.i32 v27
+      nextln:   jump addr_0_block_7(v25)
+      check: addr_0_block_7(v21: i32): // preds: addr_0_block_5 addr_0_block_6
+      nextln:   v22 = i32.or v17, v21
+      nextln:   v23 = i32.lshr v22, 0x1f
+      nextln:   v24 = i1.trunc.i32 v23
+      check: addr_0_block_8(v8: i32): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v9 = i64.zext.i32 0x0
+      nextln:   v10 = i64.lshl v9, 0x20
+      nextln:   v11 = i64.zext.i32 v8
+      nextln:   v12 = i64.or v10, v11
+      nextln:   write_reg.i64 v12, "x1"

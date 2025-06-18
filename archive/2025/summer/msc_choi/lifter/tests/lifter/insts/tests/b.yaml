@@ -1,0 +1,8 @@
+tests:
+- name: b_1
+  bytes: [0x00, 0x00, 0x00, 0x14]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   jump addr_0
+      check: addr_0: // preds: entry addr_0
+      nextln:   jump addr_0

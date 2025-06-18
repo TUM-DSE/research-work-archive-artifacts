@@ -1,0 +1,161 @@
+tests:
+- name: consecutive_1
+  bytes: [0x21, 0x00, 0x00, 0x9a, 0x21, 0x00, 0x00, 0x9a, 0x21, 0x00, 0x00, 0x9a]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i64.read_reg "x0"
+      nextln:   v2 = i1.read_reg "c"
+      nextln:   v3 = i64.unsigned_from_bits v0
+      nextln:   v4 = i64.unsigned_from_bits v1
+      nextln:   v5 = int.add v3, v4
+      nextln:   v6 = i1.unsigned_from_bits v2
+      nextln:   v7 = int.add v5, v6
+      nextln:   v8 = i64.signed_from_bits v0
+      nextln:   v9 = i64.signed_from_bits v1
+      nextln:   v10 = int.add v8, v9
+      nextln:   v11 = i1.unsigned_from_bits v2
+      nextln:   v12 = int.add v10, v11
+      nextln:   v13 = i64.to_bits v7
+      nextln:   v14 = i64.lshr v13, 0x3f
+      nextln:   v15 = i1.trunc.i64 v14
+      nextln:   v16 = bool.icmp.i64.eq v13, 0x0
+      nextln:   jumpif v16, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x1)
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_2(v17: i1): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v18 = i64.unsigned_from_bits v13
+      nextln:   v19 = bool.icmp.int.eq v18, v7
+      nextln:   jumpif v19, addr_0_block_3, addr_0_block_4
+      check: addr_0_block_3: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x0)
+      check: addr_0_block_4: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x1)
+      check: addr_0_block_5(v20: i1): // preds: addr_0_block_3 addr_0_block_4
+      nextln:   v21 = i64.signed_from_bits v13
+      nextln:   v22 = bool.icmp.int.eq v21, v12
+      nextln:   jumpif v22, addr_0_block_6, addr_0_block_7
+      check: addr_0_block_6: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x0)
+      check: addr_0_block_7: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x1)
+      check: addr_0_block_8(v23: i1): // preds: addr_0_block_6 addr_0_block_7
+      nextln:   v24 = i2.zext.i1 v15
+      nextln:   v25 = i2.lshl v24, 0x1
+      nextln:   v26 = i2.zext.i1 v17
+      nextln:   v27 = i2.or v25, v26
+      nextln:   v28 = i3.zext.i2 v27
+      nextln:   v29 = i3.lshl v28, 0x1
+      nextln:   v30 = i3.zext.i1 v20
+      nextln:   v31 = i3.or v29, v30
+      nextln:   v32 = i4.zext.i3 v31
+      nextln:   v33 = i4.lshl v32, 0x1
+      nextln:   v34 = i4.zext.i1 v23
+      nextln:   v35 = i4.or v33, v34
+      nextln:   write_reg.i64 v13, "x1"
+      nextln:   v36 = i64.read_reg "x1"
+      nextln:   v37 = i64.read_reg "x0"
+      nextln:   v38 = i1.read_reg "c"
+      nextln:   v39 = i64.unsigned_from_bits v36
+      nextln:   v40 = i64.unsigned_from_bits v37
+      nextln:   v41 = int.add v39, v40
+      nextln:   v42 = i1.unsigned_from_bits v38
+      nextln:   v43 = int.add v41, v42
+      nextln:   v44 = i64.signed_from_bits v36
+      nextln:   v45 = i64.signed_from_bits v37
+      nextln:   v46 = int.add v44, v45
+      nextln:   v47 = i1.unsigned_from_bits v38
+      nextln:   v48 = int.add v46, v47
+      nextln:   v49 = i64.to_bits v43
+      nextln:   v50 = i64.lshr v49, 0x3f
+      nextln:   v51 = i1.trunc.i64 v50
+      nextln:   v52 = bool.icmp.i64.eq v49, 0x0
+      nextln:   jumpif v52, addr_4_block_0, addr_4_block_1
+      check: addr_4_block_0: // preds: addr_0_block_8
+      nextln:   jump addr_4_block_2(0x1)
+      check: addr_4_block_1: // preds: addr_0_block_8
+      nextln:   jump addr_4_block_2(0x0)
+      check: addr_4_block_2(v53: i1): // preds: addr_4_block_0 addr_4_block_1
+      nextln:   v54 = i64.unsigned_from_bits v49
+      nextln:   v55 = bool.icmp.int.eq v54, v43
+      nextln:   jumpif v55, addr_4_block_3, addr_4_block_4
+      check: addr_4_block_3: // preds: addr_4_block_2
+      nextln:   jump addr_4_block_5(0x0)
+      check: addr_4_block_4: // preds: addr_4_block_2
+      nextln:   jump addr_4_block_5(0x1)
+      check: addr_4_block_5(v56: i1): // preds: addr_4_block_3 addr_4_block_4
+      nextln:   v57 = i64.signed_from_bits v49
+      nextln:   v58 = bool.icmp.int.eq v57, v48
+      nextln:   jumpif v58, addr_4_block_6, addr_4_block_7
+      check: addr_4_block_6: // preds: addr_4_block_5
+      nextln:   jump addr_4_block_8(0x0)
+      check: addr_4_block_7: // preds: addr_4_block_5
+      nextln:   jump addr_4_block_8(0x1)
+      check: addr_4_block_8(v59: i1): // preds: addr_4_block_6 addr_4_block_7
+      nextln:   v60 = i2.zext.i1 v51
+      nextln:   v61 = i2.lshl v60, 0x1
+      nextln:   v62 = i2.zext.i1 v53
+      nextln:   v63 = i2.or v61, v62
+      nextln:   v64 = i3.zext.i2 v63
+      nextln:   v65 = i3.lshl v64, 0x1
+      nextln:   v66 = i3.zext.i1 v56
+      nextln:   v67 = i3.or v65, v66
+      nextln:   v68 = i4.zext.i3 v67
+      nextln:   v69 = i4.lshl v68, 0x1
+      nextln:   v70 = i4.zext.i1 v59
+      nextln:   v71 = i4.or v69, v70
+      nextln:   write_reg.i64 v49, "x1"
+      nextln:   v72 = i64.read_reg "x1"
+      nextln:   v73 = i64.read_reg "x0"
+      nextln:   v74 = i1.read_reg "c"
+      nextln:   v75 = i64.unsigned_from_bits v72
+      nextln:   v76 = i64.unsigned_from_bits v73
+      nextln:   v77 = int.add v75, v76
+      nextln:   v78 = i1.unsigned_from_bits v74
+      nextln:   v79 = int.add v77, v78
+      nextln:   v80 = i64.signed_from_bits v72
+      nextln:   v81 = i64.signed_from_bits v73
+      nextln:   v82 = int.add v80, v81
+      nextln:   v83 = i1.unsigned_from_bits v74
+      nextln:   v84 = int.add v82, v83
+      nextln:   v85 = i64.to_bits v79
+      nextln:   v86 = i64.lshr v85, 0x3f
+      nextln:   v87 = i1.trunc.i64 v86
+      nextln:   v88 = bool.icmp.i64.eq v85, 0x0
+      nextln:   jumpif v88, addr_8_block_0, addr_8_block_1
+      check: addr_8_block_0: // preds: addr_4_block_8
+      nextln:   jump addr_8_block_2(0x1)
+      check: addr_8_block_1: // preds: addr_4_block_8
+      nextln:   jump addr_8_block_2(0x0)
+      check: addr_8_block_2(v89: i1): // preds: addr_8_block_0 addr_8_block_1
+      nextln:   v90 = i64.unsigned_from_bits v85
+      nextln:   v91 = bool.icmp.int.eq v90, v79
+      nextln:   jumpif v91, addr_8_block_3, addr_8_block_4
+      check: addr_8_block_3: // preds: addr_8_block_2
+      nextln:   jump addr_8_block_5(0x0)
+      check: addr_8_block_4: // preds: addr_8_block_2
+      nextln:   jump addr_8_block_5(0x1)
+      check: addr_8_block_5(v92: i1): // preds: addr_8_block_3 addr_8_block_4
+      nextln:   v93 = i64.signed_from_bits v85
+      nextln:   v94 = bool.icmp.int.eq v93, v84
+      nextln:   jumpif v94, addr_8_block_6, addr_8_block_7
+      check: addr_8_block_6: // preds: addr_8_block_5
+      nextln:   jump addr_8_block_8(0x0)
+      check: addr_8_block_7: // preds: addr_8_block_5
+      nextln:   jump addr_8_block_8(0x1)
+      check: addr_8_block_8(v95: i1): // preds: addr_8_block_6 addr_8_block_7
+      nextln:   v96 = i2.zext.i1 v87
+      nextln:   v97 = i2.lshl v96, 0x1
+      nextln:   v98 = i2.zext.i1 v89
+      nextln:   v99 = i2.or v97, v98
+      nextln:   v100 = i3.zext.i2 v99
+      nextln:   v101 = i3.lshl v100, 0x1
+      nextln:   v102 = i3.zext.i1 v92
+      nextln:   v103 = i3.or v101, v102
+      nextln:   v104 = i4.zext.i3 v103
+      nextln:   v105 = i4.lshl v104, 0x1
+      nextln:   v106 = i4.zext.i1 v95
+      nextln:   v107 = i4.or v105, v106
+      nextln:   write_reg.i64 v85, "x1"

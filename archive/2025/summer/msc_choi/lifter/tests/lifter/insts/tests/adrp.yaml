@@ -1,0 +1,12 @@
+tests:
+- name: adrp_1
+  bytes: [0x00, 0x00, 0x00, 0x90]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x0, "x0"
+- name: adrp_2
+  bytes: [0x00, 0x00, 0x00, 0xb0]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   write_reg.i64 0x1000, "x0"
+

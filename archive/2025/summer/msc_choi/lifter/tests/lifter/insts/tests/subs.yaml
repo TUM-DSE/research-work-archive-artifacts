@@ -1,0 +1,137 @@
+tests:
+- name: subs_1
+  bytes: [0x21, 0x00, 0x00, 0xeb]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i64.read_reg "x0"
+      nextln:   v2 = i64.bitwise_not v1
+      nextln:   v3 = i64.unsigned_from_bits v0
+      nextln:   v4 = i64.unsigned_from_bits v2
+      nextln:   v5 = int.add v3, v4
+      nextln:   v6 = int.add v5, 0x1
+      nextln:   v7 = i64.signed_from_bits v0
+      nextln:   v8 = i64.signed_from_bits v2
+      nextln:   v9 = int.add v7, v8
+      nextln:   v10 = int.add v9, 0x1
+      nextln:   v11 = i64.to_bits v6
+      nextln:   v12 = i64.lshr v11, 0x3f
+      nextln:   v13 = i1.trunc.i64 v12
+      nextln:   v14 = bool.icmp.i64.eq v11, 0x0
+      nextln:   jumpif v14, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x1)
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_2(v15: i1): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v16 = i64.unsigned_from_bits v11
+      nextln:   v17 = bool.icmp.int.eq v16, v6
+      nextln:   jumpif v17, addr_0_block_3, addr_0_block_4
+      check: addr_0_block_3: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x0)
+      check: addr_0_block_4: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x1)
+      check: addr_0_block_5(v18: i1): // preds: addr_0_block_3 addr_0_block_4
+      nextln:   v19 = i64.signed_from_bits v11
+      nextln:   v20 = bool.icmp.int.eq v19, v10
+      nextln:   jumpif v20, addr_0_block_6, addr_0_block_7
+      check: addr_0_block_6: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x0)
+      check: addr_0_block_7: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x1)
+      check: addr_0_block_8(v21: i1): // preds: addr_0_block_6 addr_0_block_7
+      nextln:   v22 = i2.zext.i1 v13
+      nextln:   v23 = i2.lshl v22, 0x1
+      nextln:   v24 = i2.zext.i1 v15
+      nextln:   v25 = i2.or v23, v24
+      nextln:   v26 = i3.zext.i2 v25
+      nextln:   v27 = i3.lshl v26, 0x1
+      nextln:   v28 = i3.zext.i1 v18
+      nextln:   v29 = i3.or v27, v28
+      nextln:   v30 = i4.zext.i3 v29
+      nextln:   v31 = i4.lshl v30, 0x1
+      nextln:   v32 = i4.zext.i1 v21
+      nextln:   v33 = i4.or v31, v32
+      nextln:   v34 = i1.trunc.i4 v33
+      nextln:   write_reg.i1 v34, "v"
+      nextln:   v35 = i4.lshr v33, 0x1
+      nextln:   v36 = i1.trunc.i4 v35
+      nextln:   write_reg.i1 v36, "c"
+      nextln:   v37 = i4.lshr v33, 0x2
+      nextln:   v38 = i1.trunc.i4 v37
+      nextln:   write_reg.i1 v38, "z"
+      nextln:   v39 = i4.lshr v33, 0x3
+      nextln:   v40 = i1.trunc.i4 v39
+      nextln:   write_reg.i1 v40, "n"
+      nextln:   write_reg.i64 v11, "x1"
+- name: subs_2
+  bytes: [0x21, 0x00, 0x00, 0x6b]
+  directives: |
+      check: entry: // entry block; no preds!
+      nextln:   v0 = i64.read_reg "x1"
+      nextln:   v1 = i32.trunc.i64 v0
+      nextln:   v2 = i64.read_reg "x0"
+      nextln:   v3 = i32.trunc.i64 v2
+      nextln:   v4 = i32.bitwise_not v3
+      nextln:   v5 = i32.unsigned_from_bits v1
+      nextln:   v6 = i32.unsigned_from_bits v4
+      nextln:   v7 = int.add v5, v6
+      nextln:   v8 = int.add v7, 0x1
+      nextln:   v9 = i32.signed_from_bits v1
+      nextln:   v10 = i32.signed_from_bits v4
+      nextln:   v11 = int.add v9, v10
+      nextln:   v12 = int.add v11, 0x1
+      nextln:   v13 = i32.to_bits v8
+      nextln:   v14 = i32.lshr v13, 0x1f
+      nextln:   v15 = i1.trunc.i32 v14
+      nextln:   v16 = bool.icmp.i32.eq v13, 0x0
+      nextln:   jumpif v16, addr_0_block_0, addr_0_block_1
+      check: addr_0_block_0: // preds: entry
+      nextln:   jump addr_0_block_2(0x1)
+      check: addr_0_block_1: // preds: entry
+      nextln:   jump addr_0_block_2(0x0)
+      check: addr_0_block_2(v17: i1): // preds: addr_0_block_0 addr_0_block_1
+      nextln:   v18 = i32.unsigned_from_bits v13
+      nextln:   v19 = bool.icmp.int.eq v18, v8
+      nextln:   jumpif v19, addr_0_block_3, addr_0_block_4
+      check: addr_0_block_3: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x0)
+      check: addr_0_block_4: // preds: addr_0_block_2
+      nextln:   jump addr_0_block_5(0x1)
+      check: addr_0_block_5(v20: i1): // preds: addr_0_block_3 addr_0_block_4
+      nextln:   v21 = i32.signed_from_bits v13
+      nextln:   v22 = bool.icmp.int.eq v21, v12
+      nextln:   jumpif v22, addr_0_block_6, addr_0_block_7
+      check: addr_0_block_6: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x0)
+      check: addr_0_block_7: // preds: addr_0_block_5
+      nextln:   jump addr_0_block_8(0x1)
+      check: addr_0_block_8(v23: i1): // preds: addr_0_block_6 addr_0_block_7
+      nextln:   v24 = i2.zext.i1 v15
+      nextln:   v25 = i2.lshl v24, 0x1
+      nextln:   v26 = i2.zext.i1 v17
+      nextln:   v27 = i2.or v25, v26
+      nextln:   v28 = i3.zext.i2 v27
+      nextln:   v29 = i3.lshl v28, 0x1
+      nextln:   v30 = i3.zext.i1 v20
+      nextln:   v31 = i3.or v29, v30
+      nextln:   v32 = i4.zext.i3 v31
+      nextln:   v33 = i4.lshl v32, 0x1
+      nextln:   v34 = i4.zext.i1 v23
+      nextln:   v35 = i4.or v33, v34
+      nextln:   v36 = i1.trunc.i4 v35
+      nextln:   write_reg.i1 v36, "v"
+      nextln:   v37 = i4.lshr v35, 0x1
+      nextln:   v38 = i1.trunc.i4 v37
+      nextln:   write_reg.i1 v38, "c"
+      nextln:   v39 = i4.lshr v35, 0x2
+      nextln:   v40 = i1.trunc.i4 v39
+      nextln:   write_reg.i1 v40, "z"
+      nextln:   v41 = i4.lshr v35, 0x3
+      nextln:   v42 = i1.trunc.i4 v41
+      nextln:   write_reg.i1 v42, "n"
+      nextln:   v43 = i64.zext.i32 0x0
+      nextln:   v44 = i64.lshl v43, 0x20
+      nextln:   v45 = i64.zext.i32 v13
+      nextln:   v46 = i64.or v44, v45
+      nextln:   write_reg.i64 v46, "x1"
