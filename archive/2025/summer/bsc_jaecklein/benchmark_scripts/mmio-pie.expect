@@ -1,0 +1,79 @@
+#!/usr/bin/env expect
+
+set sizeList { 1 2 4 8 }
+
+if { $argc < 5 } {
+	puts "Usage: programm-path <Name of module> <output file> <output prefix> <number of retries> <number of operations for each insmod>"
+	exit 1
+}
+
+lassign $argv module filename prefix retries nr_ops
+
+set file [open $filename "a"]
+
+# This file writing is copied from https://stackoverflow.com/a/67265956
+proc writeToFile {string file pre} {
+    puts $file "$pre$string"
+}
+
+set timeout 30
+
+spawn sudo ../qemu/build/qemu-system-x86_64 \
+        -m 8G \
+        -object memory-backend-memfd,id=sysmem-file,size=8G \
+        -numa node,memdev=sysmem-file \
+        -smp 8 \
+        -kernel ../spdm-linux/arch/x86/boot/bzImage \
+        -append "console=ttyS0 root=/dev/sda rw earlyprintk=serial net.ifnames=0 nokaslr" \
+        -drive file=../qemu-image.img,format=raw \
+        -object memory-backend-file,size=1M,share=on,mem-path=/dev/shm/ivshmem,id=hostmem \
+	-device ivshmem-plain,memdev=hostmem \
+	-net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10021-:22 \
+        -net nic,model=e1000 \
+        -enable-kvm \
+        -nographic \
+	-cpu EPYC-v4,+vpclmulqdq \
+	-no-reboot \
+	-machine q35,confidential-guest-support=sev0 \
+	-bios ../OVMF.fd \
+	-device disagg-fake-pci,bar-size=1048576 \
+	-object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,policy=0x30000
+
+# workaround to send a key-hit to the vm
+# requires as it does not show login prompt otherwise (also not working with sleep)
+expect {
+    timeout {
+	send "\r"
+    }
+}
+
+expect "login:" { send "root\r" }
+expect "Password:" { send "test\r" }
+expect "#" { send "cd /modules\r" }
+
+foreach size $sizeList {
+    set i 0
+    while { $i < $retries } {
+	expect "#" { send "insmod $module.ko mmio_size=$size count_ops=$nr_ops\r" }
+	set n 0
+	while { $n < 1 } {
+		set p 0
+		while { $p < 4 } {
+			expect -re "time measured pie: (.+) end" { writeToFile $expect_out(1,string) $file $prefix }
+			incr p
+		}
+#		expect -re "time measured: (.+) end" { writeToFile $expect_out(1,string) $file $prefix }
+		incr n
+	}
+	expect "#" { send "rmmod $module.ko\r" }
+
+	puts stderr "$size: $i"
+	incr i
+    }
+}
+
+expect "#" { send "shutdown -h now\r" }
+expect eof
+
+close $file
+
