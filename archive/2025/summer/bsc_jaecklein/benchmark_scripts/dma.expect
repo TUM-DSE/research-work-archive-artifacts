@@ -1,0 +1,88 @@
+#!/usr/bin/env expect
+
+# 10^6 is max as we only have 1MB buffer and kmalloc also does not like bigger ones
+# Size of DMA buffers
+#set sizeList { 1 10 100 1000 10000 100000 200000 300000 400000 500000 600000 700000 800000 900000 1000000 }
+#set sizeList {4 64 128 256 512 1024 4096 8192 16384 32768 65536 131072 262144 524288 786432 1040384 } 
+set sizeList {4 32 64 128 256 512 1024 2048 4096 8192 }
+
+if { $argc < 5 } {
+	puts "Usage: programm-path <Name of module> <output file> <output prefix> <number of retries> <number of operations for each insmod>"
+	exit 1
+}
+
+lassign $argv module filename prefix retries nr_ops
+
+set file [open $filename "a"]
+
+# This file writing is copied from https://stackoverflow.com/a/67265956
+proc writeToFile {string file pre} {
+    puts $file "$pre$string"
+}
+
+set timeout 30
+
+spawn sudo ../qemu/build/qemu-system-x86_64 \
+        -m 8G \
+        -object memory-backend-memfd,id=sysmem-file,size=8G \
+        -numa node,memdev=sysmem-file \
+        -smp 8 \
+        -kernel ../spdm-linux/arch/x86/boot/bzImage \
+        -append "console=ttyS0 root=/dev/sda rw earlyprintk=serial net.ifnames=0 nokaslr" \
+        -drive file=../qemu-image.img,format=raw \
+        -object memory-backend-file,size=1M,share=on,mem-path=/dev/shm/ivshmem,id=hostmem \
+	-device ivshmem-plain,memdev=hostmem \
+	-net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10021-:22 \
+        -net nic,model=e1000 \
+        -enable-kvm \
+        -nographic \
+	-cpu EPYC-v4,+vpclmulqdq \
+	-bios ../OVMF.fd \
+	-no-reboot \
+	-machine q35,confidential-guest-support=sev0 \
+	-object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,policy=0x30000 \
+	-device disagg-fake-pci,bar-size=1048576
+
+
+
+
+# workaround to send a key-hit to the vm
+# requires as it does not show login prompt otherwise (also not working with sleep)
+expect {
+    timeout {
+	send "\r"
+    }
+}
+
+expect "login:" { send "root\r" }
+expect "Password:" { send "test\r" }
+expect "#" { send "cd /modules\r" }
+
+foreach size $sizeList {
+    set i 0
+    while { $i < $retries } {
+	expect "#" { send "insmod benchmark-dma_to_device.ko dma_size=$size count_ops=$nr_ops\r" }
+	expect -re "time measured: (.+) end" { writeToFile $expect_out(1,string) $file "$prefix;To device;" }
+	expect "#" { send "rmmod benchmark-dma_to_device.ko\r" }
+	incr i
+    }
+
+    puts stderr "$size"
+}
+
+foreach size $sizeList {
+    set i 0
+    while { $i < $retries } {
+	expect "#" { send "insmod benchmark-dma_from_device.ko dma_size=$size count_ops=$nr_ops\r" }
+	expect -re "time measured: (.+) end" { writeToFile $expect_out(1,string) $file "$prefix;From device;" }
+	expect "#" { send "rmmod benchmark-dma_from_device.ko\r" }
+	incr i
+    }
+
+    puts stderr "$size"
+}
+
+expect "#" { send "shutdown -h now\r" }
+expect eof
+
+close $file
