@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "Terminology Agent System"
+version = "0.1.0"
+description = "A system for terminology extraction and management."
+authors = ["ge95zew@mytum.de"]
+packages = [
+    { include = "src" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+fastapi = "^0.115.12"
+pydantic = "^2.10.6"
+python-dotenv = "^1.0.1"
+pyate = "^0.5.5"
+tqdm = "^4.67.1"
+pypdf = "^5.5.0"
+httpx = "^0.28.1"
+backoff = "^2.2.1"
+spacy = "^3.8.7"
+uvicorn = "0.34.3"
+pyjwt = {extras = ["crypto"], version = "^2.10.1"}
+msal = "^1.32.3"
+openai = "1.91.0"
+docling = "2.38.0"
+torch = "2.7.1+cpu"
+#torchvision = "0.22.1+cpu"
+python-multipart = "^0.0.20"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+start = "uvicorn:main"
+
