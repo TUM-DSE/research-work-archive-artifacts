@@ -31,4 +31,4 @@ This repository contains:
 3. Follow the instructions in each repository’s `README.md` to build and run the code.
 4. Use the evaluation scripts to run the benchmarks.
 5. Use the data collection script to aggregate the benchmark results in single .csv files for SPEC and non SPEC workloads.  
-6. Use this [script](results_notebook.ipynb) to generate plots.
+6. Use this [script](evaluation_utils.ipynb) to generate plots.
