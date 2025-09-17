@@ -12,7 +12,7 @@
 | Hristina Yordanova Grigorova | Online OS reconfiguration for Cloud DBMS | BA | Ilya Meignan--Masson | [Source](/archive/2025/summer/bsc_grigorova) | 
 | Jonas Ludwig Gerg | Automatic Term Extraction based on GenAI | BA | Bernd Brügge | [Source](summer/bsc_gerg)   
 | Steve Bambou Biangang | Evaluation of Multiple Branch Prediction's Potential in the Context of Wide-Pipeline Architectures | BA | Dr. David Schall | [Source](/archive/2025/summer/bsc_bambou) |
-| Anton Ge                          | Page Fault Forwarding via User-Interrupts                                                 | BA   | Dr. David Schall, Ilya Meignan--Masson.  | [Source](/archive/2025/summer/bsc_ge)                         |
+| Anton Ge                          | Page Fault Forwarding via User-Interrupts                                                 | BA   | Dr. David Schall, Ilya Meignan--Masson   | [Source](/archive/2025/summer/bsc_ge)                         |
 
 ## Winter semester
 
