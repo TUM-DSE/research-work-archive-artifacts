@@ -1,0 +1,12 @@
+category, count
+assembly, 21
+mistranslation, 25
+device, 7
+debug, 3
+peripherals, 1
+performance, 1
+kernel, 7
+hypervisor, 6
+network, 1
+kvm, 3
+permissions, 1
