@@ -1,0 +1,16 @@
+[project]
+name = "miasm"
+version = "0.1.4"
+requires-python = "==3.12.*"
+description = "Reverse engineering framework in Python"
+readme = {file = "README.md", content-type = "text/markdown"}
+dependencies = [
+	"future",
+	"pyparsing",
+	"setuptools",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+

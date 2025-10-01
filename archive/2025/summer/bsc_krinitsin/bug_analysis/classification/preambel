@@ -1,0 +1,24 @@
+
+Classify the given bug report. It is part of qemu.
+
+These are the possible categories:
+
+mistranslation: incorrect semantic mapping from source architecture to IR/target, which happens in user-mode
+assembly: assembly lowering
+other: other
+device
+graphic
+socket
+network
+kvm
+boot
+vnc
+debug
+files
+permissions
+performance
+kernel
+peripherals
+hypervisor
+
+Respond only with a single word, the name of the category. 
