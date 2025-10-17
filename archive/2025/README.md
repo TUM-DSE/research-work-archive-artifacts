@@ -14,6 +14,7 @@
 | Steve Bambou Biangang | Evaluation of Multiple Branch Prediction's Potential in the Context of Wide-Pipeline Architectures | BA | Dr. David Schall | [Source](/archive/2025/summer/bsc_bambou) |
 | Anton Ge                          | Page Fault Forwarding via User-Interrupts                                                 | BA   | Dr. David Schall, Ilya Meignan--Masson   | [Source](/archive/2025/summer/bsc_ge)                         |
 | Christian Krinitsin               | Analysis and Validation of Mistranslation Errors in Emulators                             | BA   | Theofilos Augoustis, Sebastian Reimers   | [Source](/archive/2025/summer/bsc_krinitsin)                         |
+| David Holzwarth                   | Exploring the Resolution of Delegations in Liquid Democracy with Fractional Delegation    | BA | Prof. Dr. Bryan Ford                       | [Source](/archive/2025/summer/bsc_holzwarth) |
 
 ## Winter semester
 
