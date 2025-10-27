@@ -15,6 +15,8 @@
 | Anton Ge                          | Page Fault Forwarding via User-Interrupts                                                 | BA   | Dr. David Schall, Ilya Meignan--Masson   | [Source](/archive/2025/summer/bsc_ge)                         |
 | Christian Krinitsin               | Analysis and Validation of Mistranslation Errors in Emulators                             | BA   | Theofilos Augoustis, Sebastian Reimers   | [Source](/archive/2025/summer/bsc_krinitsin)                         |
 | David Holzwarth                   | Exploring the Resolution of Delegations in Liquid Democracy with Fractional Delegation    | BA | Prof. Dr. Bryan Ford                       | [Source](/archive/2025/summer/bsc_holzwarth) |
+| Shrief Hussien                   | GDPR Metadata Indexing Optimization    | MA | Dr. Dimitrios Stavrakakis          | [Source](/archive/2025/summer/msc_hussien) |
+
 
 ## Winter semester
 
