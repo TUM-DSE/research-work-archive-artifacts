@@ -17,7 +17,7 @@ fi
 all=("b+tree" "bfs" "dwt2d" "gaussian" "hotspot" "hotspot3D" "lavaMD" "lud" "myocyte" "nn" "nw" "particlefilter" "pathfinder")
 
 b+tree() {
-  $GEM5 -d btree_$LATENCY$SUFFIX      \
+  $GEM5 -d b+tree_$LATENCY$SUFFIX      \
         -r -e                         \
         $CONF -n 4 -u 4 $lat          \
         --cmd $RODINIA_BIN/b+tree.out \
@@ -132,7 +132,7 @@ if [ "$#" -eq 1 ]; then
     printf "Running all benchmarks\n" 
     for b in "${all[@]}"; do
       $b &
-    end
+    done
     wait
     printf "All benchmarks finished\n"
     exit 0
