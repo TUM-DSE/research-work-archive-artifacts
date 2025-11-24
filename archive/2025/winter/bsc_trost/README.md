@@ -40,7 +40,8 @@ Compile it in the `gcn-gpu` docker with:
 ```
 /rodinia-hip $ make
 ```
-Be sure to get the data provided with hip as mentioned in its [README](rodinia_hip/README).
+> [!WARNING]
+> Be sure to get the data provided with hip as mentioned in its [README](rodinia_hip/README).
 It seems the virginia link is down, get it from the provided dropbox link instead.
 
 Then run it with the cxl apu using:
