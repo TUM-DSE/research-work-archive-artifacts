@@ -1,0 +1,22 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8501:8501"
+    restart: always
+
+  symptex:
+    build:
+      context: ./api
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://ilvi:ilvi@postgres:5432/ilvi
+    networks:
+      - ilvi-api_default
+
+networks:
+  ilvi-api_default:
+    external: true

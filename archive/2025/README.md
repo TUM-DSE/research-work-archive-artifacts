@@ -16,7 +16,7 @@
 | Christian Krinitsin               | Analysis and Validation of Mistranslation Errors in Emulators                             | BA   | Theofilos Augoustis, Sebastian Reimers   | [Source](/archive/2025/summer/bsc_krinitsin)                         |
 | David Holzwarth                   | Exploring the Resolution of Delegations in Liquid Democracy with Fractional Delegation    | BA | Prof. Dr. Bryan Ford                       | [Source](/archive/2025/summer/bsc_holzwarth) |
 | Shrief Hussien                   | GDPR Metadata Indexing Optimization    | MA | Dr. Dimitrios Stavrakakis          | [Source](/archive/2025/summer/msc_hussien) |
-
+| Kevin-Florian Su                   | Symptex: AI-Driven Simulated Patient History-Taking for Medical Training    | MA | Dr. Nadine von Frankenberg und Ludwigsdorff          | [Source](/archive/2025/summer/msc_su) |
 
 ## Winter semester
 
