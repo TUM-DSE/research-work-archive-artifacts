@@ -1,0 +1,41 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+
+\input{colors}
+\begin{document}
+
+
+\begin{tikzpicture}
+    %[trim axis left, trim axis right]
+\begin{axis}[
+    trim axis left,
+    xtick=data,
+    ylabel={Speedup of Simulated Time},
+    xlabel={CXL Latency (Cycles)},
+    width=0.9\textwidth,
+    enlarge x limits=0.05,
+    height=7cm,
+    legend entries={Samples, Weighted Linear Fit},
+    legend style={at={(0.5,-0.25)},anchor=north,legend columns=-1},
+    table/col sep=semicolon,
+    ]
+    \addplot+[
+        only marks,
+        error bars/.cd,
+        y dir=both,
+        y explicit,
+    ] table [
+        y error plus=ErrUpper,
+        y error minus=ErrLower,
+        x = Latency,
+        y = Speedup,
+    ] {data/latency/latency_rtime.csv};
+
+    \addplot[domain=120:200 ,color=linfit, thick] {-0.0014684208376095735*x + 1.169149250217431};
+    
+\end{axis}
+\end{tikzpicture}
+
+\end{document}

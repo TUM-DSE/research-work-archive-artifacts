@@ -22,3 +22,4 @@
 
 | Student                           | Title                                                                                     | Type | Advisors                                 | Artifacts                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------- | ---- | ---------------------------------------- | ------------------------------------------------------------- |
+| Victor Fritz Trost                |Disaggregated, Vendor-Generic APUs with CXL                                                | BA   | Dr. Anatole Lefort, Nicolò Carpentieri   | [Source](/archive/2025/winter/bsc_trost)                      |

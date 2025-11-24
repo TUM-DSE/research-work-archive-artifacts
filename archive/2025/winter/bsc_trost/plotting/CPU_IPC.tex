@@ -1,0 +1,39 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{compat=1.18}
+
+\input{colors}
+\begin{document}
+
+
+\begin{tikzpicture}
+  %[trim axis left, trim axis right]
+\begin{axis}[
+    symbolic x coords={b+tree, bfs, dwt2d, gaussian, hotspot, hotspot3D, lavaMD, lud, myocyte, nn, nw, particlefilter, pathfinder},
+    xtick=data,
+    xticklabel style={rotate=45, anchor=north east},
+    ylabel={IPC on core 0},
+    ybar = 0.2cm,
+    ymin = 0,
+    width=\textwidth,
+    enlarge x limits=0.05,
+    height=7cm,
+    legend style={at={(0.5,-0.4)},anchor=north,legend columns=-1},
+    legend entries={Original, Our Model},
+    table/col sep=semicolon,
+    ]
+
+    \addplot[ybar,fill=orig, draw=none, bar shift=-5pt] 
+    table [x=Benchmark, y expr=\thisrow{Instructions}/\thisrow{Cycles}, col sep=semicolon] 
+    {data/CPU/cpu0_IPCorig.csv};
+    
+    \addplot[ybar,fill=cxl, draw=none, bar shift=+5pt]
+    table [x=Benchmark, y expr=\thisrow{Instructions}/\thisrow{Cycles}, col sep=semicolon] 
+    {data/CPU/cpu0_IPC.csv};
+    
+\end{axis}
+\end{tikzpicture}
+
+\end{document}

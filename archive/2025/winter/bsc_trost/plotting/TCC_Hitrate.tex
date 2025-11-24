@@ -1,0 +1,47 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{pgfplotstable}
+\input{colors}
+
+\begin{document}
+\pgfplotstableread[col sep=semicolon]{data/TCC/TCC_Hits.csv}\table
+\pgfplotstableread[col sep=semicolon]{data/TCC/TCC_Hitsorig.csv}\tableOrig
+\begin{tikzpicture}
+    %[trim axis left, ]
+
+\begin{axis}[
+    ybar = 0.2cm,
+    xtick=data,
+    xticklabel style={rotate=45, anchor=north east},
+    xticklabels from table={\table}{Benchmark},
+    ylabel={TCC Hit Rate},
+    ymin = 0,
+    width=0.9\textwidth,
+    enlarge x limits=0.05,
+    height=7cm,
+    legend style={at={(0.5,-0.35)},anchor=north,legend columns=-1},
+    legend entries={Original, Our Model},
+    table/col sep=semicolon,
+    unbounded coords = discard, 
+]
+
+    \addplot[ybar,fill=orig, draw=none, bar shift=-5pt]
+        table [
+            x expr=\coordindex, 
+            y expr={\thisrow{Hits} > 0 ? \thisrow{Hits}/\thisrow{Accesses} : nan}
+        ]
+        {\tableOrig};
+    
+    \addplot[ybar,fill=cxl, draw=none, bar shift=+5pt]
+        table [
+            x expr=\coordindex, 
+            y expr={\thisrow{Hits} > 0 ? \thisrow{Hits}/\thisrow{Accesses} : nan}
+        ]
+        {\table};
+        
+
+\end{axis}
+\end{tikzpicture}
+
+\end{document}

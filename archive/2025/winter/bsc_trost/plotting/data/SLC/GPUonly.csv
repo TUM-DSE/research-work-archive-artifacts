@@ -1,0 +1,4 @@
+Benchmark;SimSeconds
+read;0.098739
+write;0.103478
+mixed;0.104209

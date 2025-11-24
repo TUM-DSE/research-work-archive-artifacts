@@ -1,0 +1,5 @@
+Benchmark;SimSeconds
+read+read;14.7421
+read+write;14.5244
+write+write;14.7388
+write+read;14.5185

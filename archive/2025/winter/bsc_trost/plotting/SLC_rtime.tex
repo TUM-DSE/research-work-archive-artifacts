@@ -1,0 +1,34 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\input{colors}
+
+\begin{document}
+\begin{tikzpicture}
+    %[trim axis left, trim axis right]
+
+\begin{axis}[
+    ybar=0.2cm,
+    width=7cm,
+    height=7cm,
+    ylabel={Simulated Time (ms)},
+    xtick=data,
+    xticklabel style={rotate=45, anchor=north east},
+    legend entries={Original, Our Model},
+    legend style={at={(0.5,-0.35)},anchor=north,legend columns=-1},
+    xticklabels from table={data/SLC/GPUonly.csv}{Benchmark}, 
+    table/col sep=semicolon,
+    y filter/.code={\pgfmathparse{#1*1000}\pgfmathresult} % Use ms instead of s
+]
+    \addplot[ybar,fill=orig,draw=none]
+        table[x expr=\coordindex, y=SimSeconds, col sep=semicolon]
+        {data/SLC/GPUonlyorig.csv};
+    \addplot[ybar,fill=cxl,draw=none]
+        table[x expr=\coordindex, y=SimSeconds, col sep=semicolon]
+        {data/SLC/GPUonly.csv};
+
+
+\end{axis}
+\end{tikzpicture}
+\end{document}

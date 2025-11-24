@@ -1,0 +1,7 @@
+Benchmark;AvrgLatency
+read;1.88874
+read+read;22.4645
+read+write;11.9748
+write;2.22631
+write+write;22.4584
+write+read;11.9893

@@ -1,0 +1,14 @@
+Benchmark;simSeconds
+b+tree;9.84925
+bfs;0.07782
+dwt2d;0.108337
+gaussian;0.085774
+hotspot;3.58622
+hotspot3D;59.0029
+lavaMD;0.316689
+lud;0.471016
+myocyte;1.03439
+nn;0.233561
+nw;0.5576
+particlefilter;0.187941
+pathfinder;1.83847

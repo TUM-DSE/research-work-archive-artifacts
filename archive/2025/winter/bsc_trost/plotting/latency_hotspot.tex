@@ -1,0 +1,38 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+
+\input{colors}
+\begin{document}
+
+
+\begin{tikzpicture}
+  %[trim axis left, trim axis right]
+\begin{axis}[
+    trim axis left,
+    xtick=data,
+    ylabel={Speedup of Simulated Time},
+    xlabel={CXL Latency (ns)},
+    width=0.9\textwidth,
+    enlarge x limits=0.05,
+    height=7cm,
+    legend entries={Samples, Weighted Linear Fit},
+    legend style={at={(0.5,-0.25)},anchor=north,legend columns=-1},
+    table/col sep=semicolon,
+    x filter/.code={\pgfmathparse{#1*0.5}\pgfmathresult} % Use ns instead of Cycles
+    % This assumes 1ps tick and 500 ticks per cycle i.e. the default in gem5
+    ]
+    \addplot+[
+        only marks,
+    ] table [
+        x = Latency,
+        y = Speedup,
+    ] {data/latency/latency_hotspot.csv};
+
+    \addplot[domain=120:1200 ,color=linfit, thick] {-9.909783504545905e-05*x + 1.0107113163064103};
+    
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
