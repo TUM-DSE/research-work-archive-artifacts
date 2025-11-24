@@ -10,7 +10,7 @@ docker run                                     \
         --device /dev/kvm                      \
         --volume path/to/your/gem5:/gem5       \
         -u $UID:$GID                           \
-        -it ghcr.io/gem5/gcn-gpu:v25-0
+        -it ghcr.io/gem5/gcn-gpu:v23-0
 ``` 
 
 Then configure a build with:
