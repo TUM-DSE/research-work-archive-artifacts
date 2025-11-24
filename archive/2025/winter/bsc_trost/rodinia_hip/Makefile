@@ -17,7 +17,6 @@ HIP:
 	cd hip/hotspot;       make; cp hotspot $(BIN_DIR)
 	cd hip/hotspot3D;     make; cp 3D $(BIN_DIR)
 	cd hip/lavaMD;        make; cp lavaMD $(BIN_DIR)
-	cd hip/leukocyte;     make; cp CUDA/leukocyte $(BIN_DIR)
 	cd hip/lud;           make; cp cuda/lud_cuda $(BIN_DIR)
 	cd hip/nn;            make; cp nn $(BIN_DIR)
 	cd hip/nw;            make; cp needle $(BIN_DIR)
