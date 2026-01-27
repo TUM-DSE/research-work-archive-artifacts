@@ -1,0 +1,32 @@
+https://gitlab.com/qemu-project/qemu/-/issues/422
+
+Unable to execute MIPS MSA code due to illegal instruction
+
+Adapted from an unanswered mailing list post.  I'm not certain it is a bug (if not, sorry for the noise), but it does seem like at least one CPU should work if it isn't.
+I'm trying to find a way to run MSA code using QEMU.  I've been able to get some MSA instructions to execute on Loongson-3A4000, but eventually I get a SIGILL.
+I have access to the source code, and I don't really care what CPU I'm targeting as long as it supports MSA, but I've had the most luck with GCC targeting mips64el.  The goal is actually to add an implementation of MSA to SIMDe (https://github.com/simd-everywhere/simde), but I need to be able to verify that I'm getting the same results as a different implementation, and since I don't have any MIPS hardware that means QEMU :)
+As an example of some failing code, I've compiled one of our tests and attached the compressed executable.
+It's compiled with mips64el-linux-gnuabi64-gcc-10 -DSIMDE_TEST_BARE -g -mmsa -static -o add-native-c path/to/add.c -lm
+If you want to try changing compilation options, I've also attached the amalgamated (not preprocessed, so it should work with clang too) source code.
+Attempting to run it with qemu (5.2.0, from Debian):
+
+qemu-mips64el-static -cpu Loongson-3A4000 ./add-native-c
+1..22
+ok 1 add/vaddd_s64
+ok 2 add/vaddd_u64
+ok 3 add/vadd_f32
+ok 4 add/vadd_f64
+ok 5 add/vadd_s8
+ok 6 add/vadd_s16
+ok 7 add/vadd_s32
+ok 8 add/vadd_s64
+ok 9 add/vadd_u8
+ok 10 add/vadd_u16
+ok 11 add/vadd_u32
+ok 12 add/vadd_u64
+qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+Illegal instruction (core dumped)
+
+
+If I add -d in_asm to the qemu command, I see it crashes on ld.b, which is indeed an MSA instruction.
+I've tried with every -cpu supported by qemu, and nothing has worked.

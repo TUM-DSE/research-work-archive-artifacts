@@ -1,0 +1,7 @@
+recursive-include src/miasm/jitter *.c *.h
+recursive-include src/miasm/jitter/arch *.c *.h
+recursive-include src/miasm/runtime *.c *.h
+include src/miams/jitter/bn.c
+include src/miams/jitter/bn.h
+include src/miasm/VERSION
+

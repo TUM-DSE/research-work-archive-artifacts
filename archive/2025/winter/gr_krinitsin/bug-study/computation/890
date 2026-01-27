@@ -1,0 +1,13 @@
+https://gitlab.com/qemu-project/qemu/-/issues/890
+
+Misinterpretation of arm neon invalid insn
+
+int main() {
+asm volatile("mov r8, #0; .inst 0xf4e844af");
+return 0;
+}
+$ arm-linux-gnueabihf-gcc -marm z.c
+$ qemu-arm ./a.out
+Should produce SIGILL for an invalid instruction.
+This is mis-interpreted as a valid insn, which produces a SIGSEGV from a load from NULL.
+Found via new risu test case.

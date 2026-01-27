@@ -1,0 +1,15 @@
+https://gitlab.com/qemu-project/qemu/-/issues/1637
+
+Crash when executing `ucomiss` instructions emulating an x86-64 CPU on an AArch64 host
+
+At Mozilla we've noticed several crashes in our crash reporting system that appear to have been sent by users running the x86-64 build of Firefox on an emulated environment using QEMU for the CPU. The hosts appear to be Apple AArch64-based laptops. The crashes all happen when executing an ucomiss instruction with a base-register + offset memory access. For example:
+https://crash-stats.mozilla.org/report/index/fa8abbea-a7b1-4cae-bede-f0e3e0230501
+The crashing instruction is ucomiss xmm0, dword [rsi + 0x7c]
+https://crash-stats.mozilla.org/report/index/6b2e8ce0-9d69-4b28-a503-2564f0230503
+The crashing instruction is ucomiss xmm0, dword [rbx + 0x4c]
+https://crash-stats.mozilla.org/report/index/2ff27094-d6f1-46e6-abd3-98e8c0230505
+The crashing instruction is ucomiss xmm4, dword [r14 + 0x8]
+https://crash-stats.mozilla.org/report/index/75a69083-52bb-4afd-add9-7c3780230503
+The crashing instruction is ucomiss xmm0, dword [r14 + 0x4c]
+In all cases what happens is that the calculated address hits a memory page that is unmapped right after the page where the object that we're accessing should be located, triggering the crash. So all crashes seem to happen exactly on a memory page boundary irrespective of the size of the object being accessed. That is the calculated address that is causing the crash is always a multiple of 4 KiB.
+Because Firefox is running within an emulated environment we don't know much about what the host looks like aside from the fact that QEMU is being used to emulate the CPU. The crashes are happening with a number of guest operating systems including old and new versions of Linux (with Ubuntu being the most common distro) and several versions of Windows, indicating that it's unlikely the bug is affected by the guest configuration. 

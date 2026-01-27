@@ -1,0 +1,49 @@
+https://gitlab.com/qemu-project/qemu/-/issues/1156
+
+Incorrect implementation of vmsumudm instruction
+
+It seems 'vmsumudm' instruction has been implemented incorrectly in qemu.
+The correct procedure looks like according to Power ISA v3.0
+
+temp <- EXTZ(VR[VRC])
+do i = 0 to 1
+prod  <- EXTZ(VR[VRA].dword[i]) × EXTZ(VR[VRB].dword[i])
+temp  <- temp + prod
+end
+VR[VRT]  <- Chop(temp, 128)
+
+
+Giving that output of qemu test of vmsumudm instruction besides looking at trans_VMSUMUDM implementation in vmx-impl.c.inc#L2988, it seems to execute the following procedure
+
+do i = 0 to 1
+prod  <- EXTZ(VR[VRA].dword[i]) × EXTZ(VR[VRB].dword[i])
+VR[VRT].dword[i]  <- prod +  EXTZ(VR[VRC].dword[i])
+end
+
+
+Steps to reproduce
+The following program will reproduce the issue
+
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+unsigned long long rval;
+__asm__ __volatile__ (
+ "li       3,2      \n"
+ "mtvsrdd  32+0,3,3 \n"
+ "vxor     1,1,1    \n"
+ "vmsumudm 0,0,0,1  \n"
+ "mfvsrld  %0,32+0"
+ : "=r" (rval)
+ :
+ :"r3","v0","v1"
+);
+printf("%llu \n", rval);
+return 0;
+}
+
+Running the binary natively produce value of 8 while emulating it through qemu print the value of 4 which is incorrect.
+Additional information
+This bug triggers false failure in the pipeline of Gitlab CI of nettle library https://gitlab.com/gnutls/nettle/-/pipelines since it uses qemu as underlying emulator to run tests for non-native architectures.

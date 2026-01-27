@@ -1,0 +1,195 @@
+[project]
+name = "miasm"
+version = "0.1.5"
+license = "GPL-2.0"
+requires-python = "==3.12.*"
+description = "Machine code manipulation library"
+readme = {file = "README.md", content-type = "text/markdown"}
+
+authors = [{ name = "Fabrice Desclaux", email = "serpilliere@droid-corp.org" },
+		   { name = "Theofilos Augoustis", email = "theofilos.augoustis@tum.de" },
+		   { name = "Christian Krinitsin", email = "christian.krinitsin@tum.de" }]
+
+dependencies = [
+	"future",
+	"pyparsing>=2.4.1",
+]
+
+keywords = [
+	"reverse engineering",
+	"disassembler",
+	"emulator",
+	"symbolic execution",
+	"intermediate representation",
+	"assembler",
+]
+
+classifiers=[
+	"Programming Language :: Python :: 2",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 2.7",
+	"Programming Language :: Python :: 3.6",
+]
+
+[project.urls]
+Homepage = "http://miasm.re"
+
+[project.optional-dependencies]
+dev = [
+	"llvmlite",
+	"pycparser",
+	"z3-solver",
+	"parameterized"
+]
+
+[build-system]
+requires = ["setuptools>=74.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = [ "src" ]
+include = [ "miasm*" ]
+
+[tool.setuptools.package-data]
+miasm = ["src/miasm/jitter/*.h", "src/miasm/jitter/*.c", "jitter/arch/*.h", "runtime/*.h", "VERSION"]
+
+# setuptools >= 74.1
+[tool.setuptools]
+include-package-data = true
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.VmMngr"
+optional = true
+sources = [
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/bn.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_x86"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_x86.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_arm"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_arm.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_aarch64"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_aarch64.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_msp430"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_msp430.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_mep"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_mep.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_mips32"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_mips32.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_ppc32"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_ppc32.c",
+]
+depends = [
+  "src/miasm/jitter/arch/JitCore_ppc32.h",
+  "src/miasm/jitter/arch/JitCore_ppc32_regs.h",
+  "src/miasm/jitter/bn.h",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.arch.JitCore_m68k"
+optional = true
+sources = [
+  "src/miasm/jitter/JitCore.c",
+  "src/miasm/jitter/vm_mngr.c",
+  "src/miasm/jitter/vm_mngr_py.c",
+  "src/miasm/jitter/op_semantics.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/jitter/arch/JitCore_m68k.c",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.Jitllvm"
+optional = true
+sources = [
+  "src/miasm/jitter/Jitllvm.c",
+  "src/miasm/jitter/bn.c",
+  "src/miasm/runtime/udivmodti4.c",
+  "src/miasm/runtime/divti3.c",
+  "src/miasm/runtime/udivti3.c",
+]
+depends = [
+  "src/miasm/runtime/export.h",
+  "src/miasm/runtime/int_endianness.h",
+  "src/miasm/runtime/int_lib.h",
+  "src/miasm/runtime/int_types.h",
+  "src/miasm/runtime/int_util.h",
+]
+
+[[tool.setuptools.ext-modules]]
+name = "miasm.jitter.Jitgcc"
+optional = true
+sources = [
+  "src/miasm/jitter/Jitgcc.c",
+  "src/miasm/jitter/bn.c",
+]
+
