@@ -1,0 +1,41 @@
+https://gitlab.com/qemu-project/qemu/-/issues/361
+
+-cpu host results in unsupported AVX512 instructions
+
+I can reproduce this bug with qemu 4.2.1 and 6.0.0. Host is running openSUSE Leap 15.2.
+To reproduce:
+
+> qemu -host cpu,check
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.0DH:EAX [bit 5]
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.0DH:EAX [bit 6]
+qemu-system-x86_64: warning: host doesn't support requested feature: CPUID.0DH:EAX [bit 7]
+
+
+Host's cpuinfo
+
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 6154 CPU @ 3.00GHz
+stepping	: 4
+microcode	: 0x1
+cpu MHz		: 2992.968
+cache size	: 25344 KB
+physical id	: 7
+siblings	: 1
+core id		: 0
+cpu cores	: 1
+apicid		: 7
+initial apicid	: 7
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs taa itlb_multihit
+bogomips	: 5985.93
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 40 bits physical, 48 bits virtual
+power management:

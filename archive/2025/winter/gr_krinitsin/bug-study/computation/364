@@ -1,0 +1,19 @@
+https://gitlab.com/qemu-project/qemu/-/issues/364
+
+qemu-aarch64: incorrect signed comparison in ldsmax instructions
+
+The ldsmax instruction provides incorrect results with negative operands in memory.
+The problem occurs when the operand size is strictly less than 64 bits (ldsmaxb, ldsmaxh and ldsmax %w).
+Attaching a small C++ program reproducing the issue ldsmax.cc.
+The program has 3 arguments which correspond to the three ldsmax operands (only ldsmaxb is tested).
+
+$ qemu-aarch64 a.out 0 -1 3
+before: 0, -1, 3
+after: 3, -1, -1
+
+
+The output shows that the instruction computes -1 as the result of signed maximum of -1 and 3.
+Notes:
+
+quick code inspection reveals that all ldsmax operands are treated as 64 bits signed integers but memory operands may not be signed extended as needed.
+a similar issue should appear for ldsmin instructions

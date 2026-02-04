@@ -1,0 +1,53 @@
+https://gitlab.com/qemu-project/qemu/-/issues/2536
+
+Dynamic translation issue of arm instruction VFNMA and VFNMS
+
+Description
+Problem Found Through Static Code Review.
+This Problem is
+
+     * VFNMA : fd = muladd(-fd,  fn, fm)
+     * VFNMS : fd = muladd(-fd, -fn, fm)
+     * VFMA  : fd = muladd( fd,  fn, fm)
+     * VFMS  : fd = muladd( fd, -fn, fm)
+
+
+should be：
+
+     * VFNMA : fd = muladd(-fd, -fn, fm)  <--
+     * VFNMS : fd = muladd(-fd,  fn, fm)  <--
+     * VFMA  : fd = muladd( fd,  fn, fm)
+     * VFMS  : fd = muladd( fd, -fn, fm)
+
+The code that caused the problem
+
+qemu/target/arm/tcg/translate-vfp.c --> do_vfm_hp,do_vfm_sp,do_vfm_dp,MAKE_VFM_TRANS_FNS
+
+#define MAKE_ONE_VFM_TRANS_FN(INSN, PREC, NEGN, NEGD)                   \
+    static bool trans_##INSN##_##PREC(DisasContext *s,                  \
+                                      arg_##INSN##_##PREC *a)           \
+    {                                                                   \
+        return do_vfm_##PREC(s, a, NEGN, NEGD);                         \
+    }
+
+#define MAKE_VFM_TRANS_FNS(PREC) \
+    MAKE_ONE_VFM_TRANS_FN(VFMA, PREC, false, false) \
+    MAKE_ONE_VFM_TRANS_FN(VFMS, PREC, true, false) \
+    MAKE_ONE_VFM_TRANS_FN(VFNMA, PREC, false, true) \
+    MAKE_ONE_VFM_TRANS_FN(VFNMS, PREC, true, true)
+
+MAKE_VFM_TRANS_FNS(hp)
+MAKE_VFM_TRANS_FNS(sp)
+MAKE_VFM_TRANS_FNS(dp)
+
+The affected code
+
+Qemu-7.2.50
+Qemu-9.0.0
+Qemu-9.1.0-rc3
+
+Official manual version
+
+armv7-DDI0406C_d_armv7ar_arm.pdf
+Arm Architecture Reference Manual (Armv8, for Armv8-A architecture profile) (ARM DDI 0487E.a (ID070919))
+ISA_AArch32_xml_A_profile-2024-03

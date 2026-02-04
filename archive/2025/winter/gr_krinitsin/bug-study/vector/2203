@@ -1,0 +1,13 @@
+https://gitlab.com/qemu-project/qemu/-/issues/2203
+
+RISC-V RVV fractional LMUL check is wrong
+
+At commit 7aa4d519, HELPER(vsetvl)'s check for fractional LMUL was changed incorrectly, and can end up shifting by a negative value for element, in practice resulting in vsetvli setting vill when it shouldn't.
+For example, the instruction vsetvli s2, x0, e8, mf2, ta, ma on a latest master build ends up at target/riscv/vector_helper.c doing:
+
+cpu->cfg.vlenb >> (8 - 3 - vlmul) < sew // the check in HELPER(vsetvl)
+cpu->cfg.vlenb >> (8 - 3 - 7) < sew
+cpu->cfg.vlenb >> (-2) < sew
+
+
+A fix can be to replace that expression with (cpu->cfg.vlenb << 3) >> (8 - vlmul) < sew, as listed within a comment in the code before the incorrect simplification.
