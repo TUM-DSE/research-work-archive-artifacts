@@ -1,0 +1,17 @@
+{
+  "crt1": "",
+  "crti": "",
+  "crtn": "",
+  "libc": "",
+  "dynamiclinker": "",
+
+  "dynamic_libs": [""],
+  "dynamic_libs_headers": [
+    "",
+    "",
+    "",
+    ""
+  ],
+
+  "runtime": "" 
+}

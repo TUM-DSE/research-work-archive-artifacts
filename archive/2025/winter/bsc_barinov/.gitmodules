@@ -1,0 +1,6 @@
+[submodule "externals/json"]
+	path = externals/json
+	url = https://github.com/nlohmann/json.git
+[submodule "externals/argparse"]
+	path = externals/argparse
+	url = https://github.com/p-ranav/argparse.git
