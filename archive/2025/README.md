@@ -25,3 +25,4 @@
 | Victor Fritz Trost                |Disaggregated, Vendor-Generic APUs with CXL                                                | BA   | Dr. Anatole Lefort, Nicolò Carpentieri   | [Source](/archive/2025/winter/bsc_trost)                      |
 | Christian Krinitsin                |Fine-grained Evaluation and Validation of Emulator Errors                                 | GR   | Theofilos Augoustis, Sebastian Reimers   | [Source](/archive/2025/winter/gr_krinitsin)                      |
 | Robert Barinov | Specification-Driven Binary Translator | BA | Martin Fink, Anders Choi | [Source](/archive/2025/winter/bsc_barinov) |
+| Peter Wegmann | Chipmunq: A Fault-Tolerant Compiler for Chiplet Quantum Architectures | MA | Aleksandra Świerkowska, Emmanouil Giortamis | [Source](/archive/2025/winter/msc_wegmann) |
