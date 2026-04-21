@@ -1,0 +1,12 @@
+hypernetx==1.2.5
+networkx
+qiskit
+qiskit-ibm-runtime
+stim
+dill
+pillow
+seaborn
+kahypar
+matplotlib
+fastjsonschema
+sympy
