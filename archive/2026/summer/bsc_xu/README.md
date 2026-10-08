@@ -1,6 +1,6 @@
-# MARS Verilog Sources
+# MARS Rocq Sources
 
-This repository contains Verilog source files for MARS, including `mars.v` and four versioned `mars_core` files.
+This repository contains Rocq source files for MARS, including `mars.v` and four versioned `mars_core` files.
 
 ## Repository Contents
 
