@@ -8,4 +8,5 @@
 | Monder Rammouz | Extending the Last-Level Cache Side-Channel Attack: A Security Analysis of Enclaves in the Modern Public Cloud | GR | Quoc-Do Le | [Source](/archive/2026/summer/gr_rammouz) |
 | Radu-Vladimir Raceala | Design and Performance Analysis of a Deterministic Network Stack for Virtualised Protection and Control Systems | BA | Dr. Anatole Lefort, Peter Okelmann | [Source](/archive/2026/summer/bsc_raceala) |
 | Junguo Xu | Formalization of the TCG MARS Specification in Rocq | BA | Julian Pritzi | [Source](/archive/2026/summer/bsc_xu) |
+| Jakob Lison             | Criticality-based Value Prediction | BA   | Dr. David Schall       |[Source](/archive/2026/summer/bsc_lison)|
 ## Winter semester
