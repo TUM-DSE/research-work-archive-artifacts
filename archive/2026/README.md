@@ -10,3 +10,8 @@
 | Junguo Xu | Formalization of the TCG MARS Specification in Rocq | BA | Julian Pritzi | [Source](/archive/2026/summer/bsc_xu) |
 | Jakob Lison | Towards Criticality-based Value Prediction | BA | Dr. David Schall | [Source](/archive/2026/summer/bsc_lison) |
 ## Winter semester
+
+
+| Student                           | Title                                                                                     | Type | Advisors                                 | Artifacts                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------- | ---- | ---------------------------------------- | ------------------------------------------------------------- |
+| Deniz Mersinlioğlu                  | Generating Loop Termination Proofs for eBPF in LLVM | BA | Martin Fink                          | [Source](/archive/2026/winter/bsc_mersinlioglu) |
