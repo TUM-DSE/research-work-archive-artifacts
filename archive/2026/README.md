@@ -9,6 +9,7 @@
 | Radu-Vladimir Raceala | Design and Performance Analysis of a Deterministic Network Stack for Virtualised Protection and Control Systems | BA | Dr. Anatole Lefort, Peter Okelmann | [Source](/archive/2026/summer/bsc_raceala) |
 | Junguo Xu | Formalization of the TCG MARS Specification in Rocq | BA | Julian Pritzi | [Source](/archive/2026/summer/bsc_xu) |
 | Jakob Lison | Towards Criticality-based Value Prediction | BA | Dr. David Schall | [Source](/archive/2026/summer/bsc_lison) |
+| Simon Weckler | IronLink: GPUDirect-enabled Confidential Virtual Machines via Trusted SmartNICs | BA | Teofil Bodea | [Source](/archive/2026/summer/bsc_weckler) |
 ## Winter semester
 
 
