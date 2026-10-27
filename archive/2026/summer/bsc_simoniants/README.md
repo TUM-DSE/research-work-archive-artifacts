@@ -37,8 +37,8 @@ All of the directories have their own `README.md` files further detailing conten
 
 - [`src/`](src/) contains the implemented reference protection workload as C-code, alongside the measurement related applications.
 
-## Two branches
+## Two branches (in this repository another directory `multivm` inside of [`src/`](src/))
 
 - `main` The main branch contains the source code used throughout the single-VM experiments.
 
-- `multivm` The multivm branch only differs from `main` in the [`src/`](src/) directory, and contains the source code which is used throughout the multi-VM experiments. The only file that changes is the [`sv_hot_receiver.c`](src/net/sv_hot_receiver.c)
+- `multivm` (In this repo: `multivm` directory; not branch) The multivm branch only differs from `main` in the [`src/`](src/) directory, and contains the source code which is used throughout the multi-VM experiments. The only file that changes is the [`sv_hot_receiver.c`](src/net/sv_hot_receiver.c)
