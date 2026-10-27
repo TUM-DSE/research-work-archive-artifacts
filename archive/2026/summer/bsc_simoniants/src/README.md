@@ -10,6 +10,8 @@ The directories directly implement the layered implementation described in the t
 
 `timing.[c|h]` implement general benchmarking capability of function invocations.
 
-## `main` and `multivm` branches
+## `main` and `multivm` branches (in this repo: directories)
 
-The only difference between the two branches consists of changes to the [`hot_receiver`](net/sv_hot_receiver.c) application to enable experiments containing multiple concurrently responding VMs.
+The only difference between the two branches (directories) consists of changes to the `hot_receiver` application to enable experiments containing multiple concurrently responding VMs.
+
+The `multivm` file is found in [`multivm/net/`](multivm/net/) at [`hot_receiver`](multivm/net/sv_hot_receiver.c)
