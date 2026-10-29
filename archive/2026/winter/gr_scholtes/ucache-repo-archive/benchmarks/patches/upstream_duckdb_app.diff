@@ -1,0 +1,58 @@
+--- a/duckdb/duckdb_app.cc
++++ b/duckdb/duckdb_app.cc
+@@ -151,6 +151,10 @@
+ #ifdef __OSV__
+     ucache::print_llfree_stats();
+     ucache::print_stats();
++    // Harness: one machine-readable row per repetition, counted per boot. The byte
++    // counters of the current tree's row do not exist here.
++    static int iteration = 0;
++    printf("@@ROW,%d,%02d,%.3f,na,na,na\n", ++iteration, qnum, elapsed / 1000.0);
+ #endif
+     return elapsed;
+ }
+@@ -278,6 +282,12 @@
+ 
+     duckdb::DuckDB db(nullptr, &config);
+     duckdb::Connection con(db);
++    // Harness: same as tpch/preamble.sql, which the other legs run.
++    {
++        auto r = con.Query("SET parquet_metadata_cache=true");
++        if (r->HasError())
++            printf("  [metadata] WARN parquet_metadata_cache: %s\n", r->GetError().c_str());
++    }
+ 
+     // if (file_cache_mem > 0) {
+     //     duckdb::ExternalFileCache::Get(*con.context).SetMaxBytes(file_cache_mem);
+@@ -331,6 +341,31 @@
+     }
+ #endif
+ 
++    // Harness: pre-read all parquet files so the metadata is cached outside the
++    // timings, as on the other legs. LIMIT 0 does this without scanning.
++    {
++        double t_meta = now_ms();
++        auto warm_file = [&](const char *path) {
++            duckdb::string sql = "SELECT * FROM '";
++            sql += path;
++            sql += "' LIMIT 0";
++            auto r = con.Query(sql);
++            if (r->HasError())
++                printf("  [metadata] WARN %s: %s\n", path, r->GetError().c_str());
++        };
++        if (run_all) {
++            for (int q = 1; q <= 22; q++)
++                for (int i = 0; tpch::kQueryFiles[q][i] != nullptr; i++)
++                    warm_file(tpch::kQueryFiles[q][i]);
++        } else {
++            for (int i = 0; tpch::kQueryFiles[query_num][i] != nullptr; i++)
++                warm_file(tpch::kQueryFiles[query_num][i]);
++        }
++        printf("  [metadata] time=%.1f ms\n", now_ms() - t_meta);
++    }
++    // Harness: tells the benchmark recipe which image it booted.
++    printf("[system] ucache_upstream\n");
++
+     if (run_all) {
+         for (int rep = 0; rep < repeat; rep++) {
+             double t_sum = 0.0;
