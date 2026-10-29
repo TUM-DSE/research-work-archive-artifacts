@@ -1,0 +1,4 @@
+[submodule "osv"]
+	path = osv
+	url = git@github.com:s-maurice/osv.git
+	branch = with-changes
