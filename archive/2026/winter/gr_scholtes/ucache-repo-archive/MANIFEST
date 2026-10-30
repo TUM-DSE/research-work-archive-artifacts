@@ -1,0 +1,20 @@
+. 0b2744bd965d29e4e5dc363bee08a932069c2d7c git@github.com:s-maurice/uCache.git
+osv c4992bbf41e4d8278fdf09302eefd3c2fb8df1a7 git@github.com:s-maurice/osv.git
+osv/benchmarks c5af1c93ec2ee443667d492c7f8c6636c291fe09 git@github.com:s-maurice/osv_benchmarks.git
+osv/benchmarks/duckdb/duckdb 25fef52979c2d561d448475395b28e3ba9b78f78 git@github.com:s-maurice/duckdb.git
+ c4992bbf41e4d8278fdf09302eefd3c2fb8df1a7 osv (v0.57.0-566-gc4992bbf)
+-2347c09a7fb55e6e13474a83339d6f4e26e43c85 osv/apps
+ c5af1c93ec2ee443667d492c7f8c6636c291fe09 osv/benchmarks (heads/with-changes)
+ 25fef52979c2d561d448475395b28e3ba9b78f78 osv/benchmarks/duckdb/duckdb (v1.5.2-12-g25fef52979)
+-6e10f1c09eeee8a9dcb8807282eadd9eca39b710 osv/benchmarks/multichase/multichase
+-5684698a848d3580102f7fc2c7457ad9245cd23e osv/benchmarks/osv_malloc_microbench
+-a0421233caec2c50e8fd8f5ff7440a660a6830ef osv/benchmarks/rocksdb/rocksdb
+-83f5ea83b04e27c3e45e368b5c548b1d3c5da843 osv/benchmarks/vmcache
+-e73c6de545d361b2c0b1ffde98384cbf4485f479 osv/benchmarks/ycsb-leveldb/leveldb
+-3e45e0f2383cabdc00275c00a12ea8797f285c30 osv/external/x64/acpica
+-9f1d27a86879d1fa0944f426f5fa20c6be8de9da osv/kbuild
+-c93b2f5cf80ac2a84b312aa97eb70a311989cf12 osv/modules/httpserver-html5-gui/osv-gui
+-5d7010b96bf64a5820f397140d270454fc6eac86 osv/modules/httpserver-html5-gui/swagger-ui
+-372a948b8139c6583045b2cd91b6b91fcb2e5881 osv/musl_0.9.12
+-ea9525c8bcf6170df59364c4bcd616de1acf8703 osv/musl_1.1.24
+excluded: *.pdf *.csv *.parquet *.gz *.db *.so, test/tests/testing dirs, duckdb data/ benchmark/, libpg_query grammar_out.output
