@@ -16,5 +16,6 @@
 
 | Student                           | Title                                                                                     | Type | Advisors                                 | Artifacts                                                     |
 | --------------------------------- | ----------------------------------------------------------------------------------------- | ---- | ---------------------------------------- | ------------------------------------------------------------- |
-| Deniz Mersinlioğlu                  | Generating Loop Termination Proofs for eBPF in LLVM | BA | Martin Fink                          | [Source](/archive/2026/winter/bsc_mersinlioglu) |
+| Deniz Mersinlioğlu                | Generating Loop Termination Proofs for eBPF in LLVM | BA | Martin Fink                          | [Source](/archive/2026/winter/bsc_mersinlioglu) |
+| Ivan Logvynenko                   | Flat memory mode for CXL GPUs                                                             | BA   | Dr. Anatole Lefort                       | [Source](/archive/2026/winter/bsc_logvynenko)                 |
 | Nguyen Le | Generation of CPU-GPU Heterogeneous Litmus Tests for Real Hardware | BA | Dr. Anatole Lefort | [Source](/archive/2026/winter/bsc_le) |
