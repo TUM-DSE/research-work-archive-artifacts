@@ -11,6 +11,7 @@
 | Junguo Xu | Formalization of the TCG MARS Specification in Rocq | BA | Julian Pritzi | [Source](/archive/2026/summer/bsc_xu) |
 | Jakob Lison | Towards Criticality-based Value Prediction | BA | Dr. David Schall | [Source](/archive/2026/summer/bsc_lison) |
 | Simon Weckler | IronLink: GPUDirect-enabled Confidential Virtual Machines via Trusted SmartNICs | BA | Teofil Bodea | [Source](/archive/2026/summer/bsc_weckler) |
+| Samuel Khuon | File-Layout-Aware Caching for Cloud-Native Analytical Query Engines | BA |  Ilya Meignan--Masson | [Source](/archive/2026/summer/bsc_khuon) |
 ## Winter semester
 
 

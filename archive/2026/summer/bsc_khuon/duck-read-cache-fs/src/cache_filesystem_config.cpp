@@ -1,0 +1,182 @@
+#include "cache_filesystem_config.hpp"
+
+#include <cstdint>
+#include <utility>
+
+#include "duckdb/common/exception.hpp"
+#include "duckdb/common/local_file_system.hpp"
+#include "duckdb/common/string_util.hpp"
+#include "size_literals.hpp"
+#include "utils/include/filesystem_utils.hpp"
+
+namespace duckdb {
+
+//===--------------------------------------------------------------------===//
+// Config constant definitions
+//===--------------------------------------------------------------------===//
+const NoDestructor<string> NOOP_CACHE_TYPE {"noop"};
+const NoDestructor<string> ON_DISK_CACHE_TYPE {"on_disk"};
+const NoDestructor<string> IN_MEM_CACHE_TYPE {"in_mem"};
+const array<string, 3> ALL_CACHE_TYPES {{"noop", "on_disk", "in_mem"}};
+
+// Cache reader names.
+const NoDestructor<string> NOOP_CACHE_READER_NAME {"noop_cache_reader"};
+const NoDestructor<string> ON_DISK_CACHE_READER_NAME {"on_disk_cache_reader"};
+const NoDestructor<string> IN_MEM_CACHE_READER_NAME {"in_mem_cache_reader"};
+
+// Creation timestamp-based on-disk eviction policy.
+const NoDestructor<string> ON_DISK_CREATION_TIMESTAMP_EVICTION {"creation_timestamp"};
+// On-disk LRU eviction policy made for single-process usage.
+const NoDestructor<string> ON_DISK_LRU_SINGLE_PROC_EVICTION {"lru_sp"};
+
+// Default profile option, which performs no-op.
+const NoDestructor<string> NOOP_PROFILE_TYPE {"noop"};
+// Store the latest IO operation profiling result, which potentially suffers concurrent updates.
+const NoDestructor<string> TEMP_PROFILE_TYPE {"temp"};
+const array<string, 2> ALL_PROFILE_TYPES {{"noop", "temp"}};
+
+// In-memory data block cache storage backend.
+const NoDestructor<string> EXT_BOUNDED_STORAGE {"extension"};
+const NoDestructor<string> OBJECT_CACHE_STORAGE {"object_cache"};
+const NoDestructor<string> POLICY_STORAGE {"policy"};
+const array<string, 3> ALL_IN_MEM_CACHE_STORAGES {{"extension", "object_cache", "policy"}};
+
+// Cache entry granularity.
+const NoDestructor<string> FIXED_CHUNKING {"fixed"};
+const NoDestructor<string> COLUMN_CHUNK_CHUNKING {"column_chunk"};
+const array<string, 2> ALL_CHUNKINGS {{"fixed", "column_chunk"}};
+const NoDestructor<string> DEFAULT_CHUNKING {*FIXED_CHUNKING};
+
+// Scope over which one eviction policy instance applies.
+const NoDestructor<string> GLOBAL_POLICY_SCOPE {"global"};
+const NoDestructor<string> PER_FILE_POLICY_SCOPE {"per_file"};
+const array<string, 2> ALL_POLICY_SCOPES {{"global", "per_file"}};
+const NoDestructor<string> DEFAULT_POLICY_SCOPE {*GLOBAL_POLICY_SCOPE};
+
+// LRU by default, matching what the stock in-memory cache does, so switching
+// storage backend alone does not silently change replacement behaviour.
+const NoDestructor<string> DEFAULT_EVICTION_POLICY {"lru"};
+
+const idx_t DEFAULT_IN_MEM_CACHE_BYTES = 0;
+
+// Off by default: the extension must behave exactly as before unless a
+// benchmark explicitly asks for simulated remote costs.
+const idx_t DEFAULT_SIM_LATENCY_US = 0;
+const double DEFAULT_SIM_BANDWIDTH_GBPS = 0.0;
+
+// Parallel read executor mode.
+const NoDestructor<string> INTERNAL_THREAD_POOL_EXECUTOR {"internal_thread_pool"};
+const NoDestructor<string> DUCKDB_TASK_SCHEDULER_EXECUTOR {"duckdb_task_scheduler"};
+const array<string, 2> ALL_PARALLEL_EXECUTOR_MODES {{"internal_thread_pool", "duckdb_task_scheduler"}};
+const NoDestructor<string> DEFAULT_PARALLEL_READ_MODE {*INTERNAL_THREAD_POOL_EXECUTOR};
+
+//===--------------------------------------------------------------------===//
+// Default configuration definitions
+//===--------------------------------------------------------------------===//
+const idx_t DEFAULT_CACHE_BLOCK_SIZE = 512_KiB;
+
+// Default to use on-disk cache filesystem.
+const NoDestructor<string> DEFAULT_CACHE_TYPE {*ON_DISK_CACHE_TYPE};
+
+// Default to extension-managed in-memory data block cache storage.
+const NoDestructor<string> DEFAULT_IN_MEM_CACHE_STORAGE {*EXT_BOUNDED_STORAGE};
+
+// Default to timestamp-based on-disk cache eviction policy.
+const NoDestructor<string> DEFAULT_ON_DISK_EVICTION_POLICY {*ON_DISK_CREATION_TIMESTAMP_EVICTION};
+
+// To prevent go out of disk space, we set a threshold to disallow local caching if insufficient. It applies to all
+// filesystems. The value here is the decimal representation for percentage value; for example, 0.05 means 5%.
+const double MIN_DISK_SPACE_PERCENTAGE_FOR_CACHE = 0.05;
+
+// By default, enable in-memory cache for disk cache reader.
+const bool DEFAULT_ENABLE_DISK_READER_MEM_CACHE = true;
+
+// Maximum in-memory cache block for disk cache reader.
+const idx_t DEFAULT_MAX_DISK_READER_MEM_CACHE_BLOCK_COUNT = 256;
+
+// Default timeout in milliseconds for in-memory cache block for disk cache reader.
+const idx_t DEFAULT_DISK_READER_MEM_CACHE_TIMEOUT_MILLISEC = 1800ULL * 1000 /*30min*/;
+
+// Maximum in-memory cache block number, which caps the overall memory consumption as (block size * max block count).
+const idx_t DEFAULT_MAX_IN_MEM_CACHE_BLOCK_COUNT = 256;
+
+// Default timeout in milliseconds for in-memory block cache entries.
+const idx_t DEFAULT_IN_MEM_BLOCK_CACHE_TIMEOUT_MILLISEC = 3600ULL * 1000 /*1hour*/;
+
+// Max number of cache entries for file metadata cache.
+const size_t DEFAULT_MAX_METADATA_CACHE_ENTRY = 250;
+
+// Timeout in milliseconds of cache entries for file metadata cache.
+const uint64_t DEFAULT_METADATA_CACHE_ENTRY_TIMEOUT_MILLISEC = 3600ULL * 1000 /*1hour*/;
+
+// Number of seconds which we define as the threshold of staleness for metadata entries.
+const idx_t CACHE_FILE_STALENESS_SECOND = 24 * 3600; // 1 day
+// Number of milliseconds which mark staleness.
+const idx_t CACHE_FILE_STALENESS_MILLISEC = CACHE_FILE_STALENESS_SECOND * 1000;
+// Number of microseconds which marks staleness.
+const idx_t CACHE_FILE_STALENESS_MICROSEC = CACHE_FILE_STALENESS_MILLISEC * 1000;
+
+// Max number of cache entries for file handle cache.
+const size_t DEFAULT_MAX_FILE_HANDLE_CACHE_ENTRY = 250;
+
+// Timeout in milliseconds of cache entries for file handle cache.
+const uint64_t DEFAULT_FILE_HANDLE_CACHE_ENTRY_TIMEOUT_MILLISEC = 3600ULL * 1000 /*1hour*/;
+
+// Max number of cache entries for glob cache.
+const size_t DEFAULT_MAX_GLOB_CACHE_ENTRY = 64;
+
+// Timeout in milliseconds of cache entries for file handle cache.
+const uint64_t DEFAULT_GLOB_CACHE_ENTRY_TIMEOUT_MILLISEC = 1800ULL * 1000 /*30min*/;
+
+// Default option for profile type.
+NoDestructor<string> DEFAULT_PROFILE_TYPE {*NOOP_PROFILE_TYPE};
+
+// Default max number of parallel subrequest for a single filesystem read request. 0 means no limit.
+uint64_t DEFAULT_MAX_SUBREQUEST_COUNT = 0;
+
+// Default enable metadata cache.
+bool DEFAULT_ENABLE_METADATA_CACHE = true;
+
+// Default enable file handle cache.
+bool DEFAULT_ENABLE_FILE_HANDLE_CACHE = true;
+
+// Default enable glob cache.
+bool DEFAULT_ENABLE_GLOB_CACHE = true;
+
+// Default enable cache validation via version tag and last modification timestamp.
+bool DEFAULT_ENABLE_CACHE_VALIDATION = false;
+
+// Default enable clearing cache on write operations.
+bool DEFAULT_CLEAR_CACHE_ON_WRITE = false;
+
+// Default not ignore SIGPIPE in the extension.
+bool DEFAULT_IGNORE_SIGPIPE = false;
+
+// Default min disk bytes required for on-disk cache; by default 0 which user doesn't specify and override, and default
+// value will be considered.
+idx_t DEFAULT_MIN_DISK_BYTES_FOR_CACHE = 0;
+
+ParallelExecutorMode ParseParallelExecutorMode(const string &mode) {
+	if (mode == *INTERNAL_THREAD_POOL_EXECUTOR) {
+		return ParallelExecutorMode::INTERNAL_THREAD_POOL;
+	}
+	if (mode == *DUCKDB_TASK_SCHEDULER_EXECUTOR) {
+		return ParallelExecutorMode::DUCKDB_TASK_SCHEDULER;
+	}
+	auto valid_values = StringUtil::Join(ALL_PARALLEL_EXECUTOR_MODES, ALL_PARALLEL_EXECUTOR_MODES.size(), ", ",
+	                                     [](const string &s) { return s; });
+	throw InvalidInputException("Invalid cache_httpfs_parallel_read_mode '%s'. Valid options are: %s", mode,
+	                            valid_values);
+}
+
+uint64_t GetThreadCountForSubrequests(uint64_t io_request_count, uint64_t max_subrequest_count) {
+	if (max_subrequest_count == 0) {
+		// Different platforms have different limits on the number of threads, use 1000 as the hard cap, above which
+		// also increases context switch overhead.
+		static constexpr uint64_t MAX_THREAD_COUNT = 1024;
+		return MinValue<uint64_t>(io_request_count, MAX_THREAD_COUNT);
+	}
+	return MinValue<uint64_t>(io_request_count, max_subrequest_count);
+}
+
+} // namespace duckdb

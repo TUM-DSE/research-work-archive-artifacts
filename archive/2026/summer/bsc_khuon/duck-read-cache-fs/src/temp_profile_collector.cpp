@@ -1,0 +1,200 @@
+#include "temp_profile_collector.hpp"
+
+#include "duckdb/common/array.hpp"
+#include "duckdb/common/types/uuid.hpp"
+#include "utils/include/no_destructor.hpp"
+#include "utils/include/time_utils.hpp"
+
+namespace duckdb {
+
+namespace {
+
+// Latency bucket boundaries in milliseconds.
+// Bucket values reference: Apache OpenDAL (Apache License 2.0)
+// https://github.com/apache/opendal/blob/main/core/layers/observe-metrics-common/src/lib.rs
+constexpr array<double, 10> kDefaultLatencyBucketsMs = {{
+    1,     // 1ms - Fastest operations, cached responses
+    10,    // 10ms - Fast metadata operations, local operations
+    50,    // 50ms - Quick operations, nearby cloud resources
+    100,   // 100ms - Standard API response times, typical cloud latency
+    250,   // 250ms - Medium operations, small data transfers
+    500,   // 500ms - Medium-long operations, larger metadata operations
+    1000,  // 1s - Long operations, small file transfers
+    2500,  // 2.5s - Extended operations, medium file transfers
+    5000,  // 5s - Long-running operations, large transfers
+    10000, // 10s - Very long operations, very large transfers
+}};
+
+// Disk cache read has lower latency, use finer-grained buckets.
+constexpr array<double, 10> kDiskCacheReadLatencyBucketsMs = {{
+    0.5,
+    1,
+    2,
+    5,
+    10,
+    25,
+    50,
+    100,
+    250,
+    500,
+}};
+
+// File path cache clear has even lower latency.
+constexpr array<double, 10> kPathClearLatencyBucketsMs = {{
+    0.1,
+    0.5,
+    1,
+    2,
+    5,
+    10,
+    25,
+    50,
+    100,
+    250,
+}};
+
+// Bucket boundaries per IO operation, indexed by IoOperation enum.
+constexpr array<const array<double, 10> *, kIoOperationCount> kLatencyBuckets = {{
+    &kDefaultLatencyBucketsMs,       // Open
+    &kDefaultLatencyBucketsMs,       // Read
+    &kDefaultLatencyBucketsMs,       // Write
+    &kDefaultLatencyBucketsMs,       // FileSync
+    &kDefaultLatencyBucketsMs,       // FileRemove
+    &kDefaultLatencyBucketsMs,       // Glob
+    &kDiskCacheReadLatencyBucketsMs, // DiskCacheRead
+    &kPathClearLatencyBucketsMs,     // FilePathCacheClear
+}};
+
+const NoDestructor<string> LATENCY_HISTOGRAM_ITEM {"latency"};
+const NoDestructor<string> LATENCY_HISTOGRAM_UNIT {"millisec"};
+} // namespace
+
+TempProfileCollector::TempProfileCollector() {
+	for (idx_t idx = 0; idx < kIoOperationCount; ++idx) {
+		const auto &buckets = *kLatencyBuckets[idx];
+		histograms[idx] = make_uniq<Histogram>(vector<double>(buckets.begin(), buckets.end()));
+		histograms[idx]->SetStatsDistribution(*LATENCY_HISTOGRAM_ITEM, *LATENCY_HISTOGRAM_UNIT);
+	}
+}
+
+LatencyGuard TempProfileCollector::RecordOperationStart(IoOperation io_oper) {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	return LatencyGuard {*this, std::move(io_oper)};
+}
+
+void TempProfileCollector::RecordOperationEnd(IoOperation io_oper, int64_t latency_millisec) {
+	const auto now = GetSteadyNowMilliSecSinceEpoch();
+
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	auto &cur_histogram = histograms[static_cast<idx_t>(io_oper)];
+	cur_histogram->Add(latency_millisec);
+	latest_timestamp = now;
+}
+
+void TempProfileCollector::RecordCacheAccess(CacheEntity cache_entity, CacheAccess cache_access, idx_t byte_count) {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	const size_t arr_idx = static_cast<size_t>(cache_entity) * kCacheAccessCount + static_cast<size_t>(cache_access);
+	++cache_access_count[arr_idx];
+
+	if (cache_entity == CacheEntity::kData) {
+		if (cache_access == CacheAccess::kCacheHit) {
+			bytes_read_from_hits += byte_count;
+		} else if (cache_access == CacheAccess::kCacheMiss) {
+			bytes_read_from_misses += byte_count;
+		}
+	}
+}
+
+void TempProfileCollector::RecordActualCacheRead(idx_t cache_bytes, idx_t actual_bytes) {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	total_bytes_to_read += actual_bytes;
+	total_bytes_to_cache += cache_bytes;
+}
+
+void TempProfileCollector::RecordBytesWritten(idx_t bytes) {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	total_bytes_written += bytes;
+}
+
+void TempProfileCollector::Reset() {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	for (auto &cur_histogram : histograms) {
+		cur_histogram->Reset();
+	}
+	cache_access_count.fill(0);
+	total_bytes_to_cache = 0;
+	total_bytes_to_read = 0;
+	bytes_read_from_hits = 0;
+	bytes_read_from_misses = 0;
+	total_bytes_written = 0;
+	latest_timestamp = 0;
+}
+
+vector<CacheAccessInfo> TempProfileCollector::GetCacheAccessInfo() const {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+	vector<CacheAccessInfo> cache_access_info;
+	cache_access_info.reserve(kCacheEntityCount);
+	for (idx_t idx = 0; idx < kCacheEntityCount; ++idx) {
+		cache_access_info.emplace_back(CacheAccessInfo {
+		    .cache_type = CACHE_ENTITY_NAMES[idx],
+		    .cache_hit_count = cache_access_count[idx * kCacheAccessCount],
+		    .cache_miss_count = cache_access_count[idx * kCacheAccessCount + 1],
+		    .cache_miss_by_in_use = cache_access_count[idx * kCacheAccessCount + 2],
+		});
+
+		// Record "bytes to read" and "bytes to cache" for data cache.
+		if (idx == static_cast<idx_t>(IoOperation::kRead)) {
+			cache_access_info[idx].total_bytes_to_cache = Value::UBIGINT(total_bytes_to_cache);
+			cache_access_info[idx].total_bytes_to_read = Value::UBIGINT(total_bytes_to_read);
+			cache_access_info[idx].bytes_read_from_hits = Value::UBIGINT(bytes_read_from_hits);
+			cache_access_info[idx].bytes_read_from_misses = Value::UBIGINT(bytes_read_from_misses);
+		}
+	}
+	return cache_access_info;
+}
+
+std::pair<string, uint64_t> TempProfileCollector::GetHumanReadableStats() {
+	const concurrency::lock_guard<concurrency::mutex> lck(stats_mutex);
+
+	string stats =
+	    StringUtil::Format("For temp profile collector and stats for %s (unit in milliseconds)\n", cache_reader_type);
+
+	// Record cache miss and cache hit count.
+	for (idx_t cur_entity_idx = 0; cur_entity_idx < kCacheEntityCount; ++cur_entity_idx) {
+		stats = StringUtil::Format(
+		    "%s\n"
+		    "%s cache hit count = %d\n"
+		    "%s cache miss count = %d\n"
+		    "%s cache miss by in-use resource = %d\n",
+		    stats, CACHE_ENTITY_NAMES[cur_entity_idx], cache_access_count[cur_entity_idx * kCacheAccessCount],
+		    CACHE_ENTITY_NAMES[cur_entity_idx], cache_access_count[cur_entity_idx * kCacheAccessCount + 1],
+		    CACHE_ENTITY_NAMES[cur_entity_idx], cache_access_count[cur_entity_idx * kCacheAccessCount + 2]);
+
+		// Record "bytes to read" and "bytes to cache" for data cache.
+		if (cur_entity_idx == static_cast<idx_t>(IoOperation::kRead)) {
+			stats = StringUtil::Format("%s\n"
+			                           "for data cache, "
+			                           "number of bytes to read = %d\n"
+			                           "number of bytes to cache = %d\n"
+			                           "bytes read from hits = %d\n"
+			                           "bytes read from misses = %d\n",
+			                           stats, total_bytes_to_read, total_bytes_to_cache, bytes_read_from_hits,
+			                           bytes_read_from_misses);
+		}
+	}
+
+	// Record IO operation latency.
+	for (idx_t cur_oper_idx = 0; cur_oper_idx < kIoOperationCount; ++cur_oper_idx) {
+		const auto &cur_histogram = histograms[cur_oper_idx];
+		if (cur_histogram->counts() == 0) {
+			continue;
+		}
+		stats = StringUtil::Format("%s\n"
+		                           "%s operation latency is %s",
+		                           stats, OPER_NAMES[cur_oper_idx], cur_histogram->FormatString());
+	}
+
+	return std::make_pair(std::move(stats), latest_timestamp);
+}
+
+} // namespace duckdb

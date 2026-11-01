@@ -1,0 +1,107 @@
+#include "test_utils.hpp"
+
+#include "cache_httpfs_instance_state.hpp"
+#include "duckdb/common/local_file_system.hpp"
+
+#include <cerrno>
+#include <cstring>
+
+#if !defined(_WIN32)
+#include <utime.h>
+#else
+#include <sys/utime.h>
+#endif
+
+namespace duckdb {
+
+TestCacheFileSystemHelper::TestCacheFileSystemHelper(TestCacheConfig config) : db() {
+	// Create and configure instance state
+	instance_state = make_shared_ptr<CacheHttpfsInstanceState>();
+
+	// Configure the instance
+	auto &inst_config = instance_state->config;
+	inst_config.cache_type = config.cache_type;
+	inst_config.cache_block_size = config.cache_block_size;
+	inst_config.profile_type = config.profile_type;
+	inst_config.on_disk_cache_directories = config.cache_directories;
+	inst_config.on_disk_eviction_policy = config.eviction_policy;
+
+	// Cache enable flags
+	inst_config.enable_metadata_cache = config.enable_metadata_cache;
+	inst_config.enable_file_handle_cache = config.enable_file_handle_cache;
+	inst_config.enable_glob_cache = config.enable_glob_cache;
+	inst_config.enable_disk_reader_mem_cache = config.enable_disk_reader_mem_cache;
+
+	// Cache sizes
+	inst_config.max_metadata_cache_entry = config.max_metadata_cache_entry;
+	inst_config.max_file_handle_cache_entry = config.max_file_handle_cache_entry;
+	inst_config.max_glob_cache_entry = config.max_glob_cache_entry;
+	inst_config.max_in_mem_cache_block_count = config.max_in_mem_cache_block_count;
+	inst_config.disk_reader_max_mem_cache_block_count = config.max_disk_reader_mem_cache_block_count;
+	inst_config.min_disk_bytes_for_cache = config.min_disk_bytes_for_cache;
+
+	// Cache behavior
+	inst_config.clear_cache_on_write = config.clear_cache_on_write;
+
+	// Initialize profile collector for INVALID_INDEX (default when no FileOpener is provided in tests)
+	// This allows tests to configure a specific profile type (e.g., "temp" for stats collection tests)
+	instance_state->profile_collector_manager.SetProfileCollector(DConstants::INVALID_INDEX, inst_config.profile_type);
+
+	// Ensure cache directories exist
+	auto local_fs = LocalFileSystem::CreateLocal();
+	for (const auto &dir : inst_config.on_disk_cache_directories) {
+		local_fs->CreateDirectory(dir);
+	}
+
+	instance_state->db_instance = db.instance.get();
+	SetInstanceState(*db.instance.get(), instance_state);
+	InitializeCacheReaderForTest(instance_state, inst_config);
+	auto internal_fs =
+	    config.internal_filesystem ? std::move(config.internal_filesystem) : LocalFileSystem::CreateLocal();
+	cache_fs = make_uniq<CacheFileSystem>(std::move(internal_fs), instance_state);
+}
+
+TestCacheFileSystemHelper::~TestCacheFileSystemHelper() {
+	// Clean up cache filesystem first
+	cache_fs.reset();
+}
+
+CacheHttpfsInstanceState &TestCacheFileSystemHelper::GetInstanceStateOrThrow() {
+	return *instance_state;
+}
+
+BaseCacheReader &TestCacheFileSystemHelper::GetCacheReader() {
+	auto *reader = instance_state->cache_reader_manager.GetCacheReader();
+	D_ASSERT(reader);
+	return *reader;
+}
+
+InstanceConfig &TestCacheFileSystemHelper::GetConfig() {
+	return instance_state->config;
+}
+
+BaseProfileCollector &TestCacheFileSystemHelper::GetProfileCollectorOrDefault(connection_t connection_id) {
+	return instance_state->profile_collector_manager.GetProfileCollectorOrDefault(connection_id);
+}
+
+void InitializeCacheReaderForTest(shared_ptr<CacheHttpfsInstanceState> &instance_state, const InstanceConfig &config) {
+	instance_state->cache_reader_manager.SetCacheReader(config, instance_state);
+}
+
+void SetFileMtime(const string &path, time_t mtime) {
+#if !defined(_WIN32)
+	struct utimbuf times;
+	times.actime = mtime;
+	times.modtime = mtime;
+	if (utime(path.c_str(), &times) != 0) {
+#else
+	struct _utimbuf times;
+	times.actime = mtime;
+	times.modtime = mtime;
+	if (_utime(path.c_str(), &times) != 0) {
+#endif
+		throw IOException("SetFileMtime failed for %s: %s", path, strerror(errno));
+	}
+}
+
+} // namespace duckdb

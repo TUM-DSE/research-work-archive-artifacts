@@ -1,0 +1,145 @@
+// Util class for disk cache operations, mainly include three parts: cache file storage, retrival and eviction, and
+// cache information query.
+
+#pragma once
+
+#include "cache_filesystem_config.hpp"
+#include "duckdb/common/optional_ptr.hpp"
+#include "duckdb/common/string.hpp"
+#include "duckdb/common/typedefs.hpp"
+#include "duckdb/common/unordered_map.hpp"
+#include "duckdb/common/vector.hpp"
+#include "page_aligned_data_chunk.hpp"
+#include "optional.hpp"
+
+#include <cstdint>
+#include <functional>
+
+namespace duckdb {
+// Forward declarations.
+class FileSystem;
+struct InstanceConfig;
+class DatabaseInstance;
+
+class DiskCacheUtil {
+public:
+	// Cache directory and cache filepath for certain request.
+	struct CacheFileDestination {
+		// Index for all cache directories.
+		idx_t cache_directory_idx = 0;
+		// Local cache filepath.
+		string cache_filepath;
+	};
+
+	// File-level cache path components computed once per remote file read.
+	struct RemoteFileCachePathInfo {
+		// Index for all cache directories.
+		idx_t cache_directory_idx = 0;
+		// Local cache filepath.
+		string cache_directory;
+		// SHA-256 hash of the remote filepath.
+		string remote_file_sha256_hex;
+		// Sanitized filename.
+		string sanitized_fname;
+	};
+
+	// Compute file-level cache path components for [remote_file] (SHA-256, sanitized basename, cache directory).
+	static RemoteFileCachePathInfo BuildRemoteFileCachePathInfo(const vector<string> &cache_directories,
+	                                                            const string &remote_file);
+
+	// Get local cache filename for the given [remote_file].
+	//
+	// Cache filename is formatted as `<cache-directory>/<filename-sha256>-<filename>-<start-offset>-<size>`. So we
+	// could get all cache files under one directory, and get all cache files with commands like `ls`.
+	//
+	// Considering the naming format, it's worth noting it might _NOT_ work for local files, including mounted
+	// filesystems.
+	static CacheFileDestination GetLocalCacheFile(const vector<string> &cache_directories, const string &remote_file,
+	                                              idx_t start_offset, idx_t bytes_to_read);
+
+	// Get local cache filepath for a chunk using precomputed [path_info].
+	static CacheFileDestination GetLocalCacheFile(const RemoteFileCachePathInfo &path_info, idx_t start_offset,
+	                                              idx_t bytes_to_read);
+
+	// Remote file information for a local cache filename.
+	struct RemoteFileInfo {
+		string remote_filename;
+		uint64_t start_offset = 0;
+		uint64_t end_offset = 0;
+	};
+
+	// Get remote file information from the given local cache [cache_filepath].
+	static RemoteFileInfo GetRemoteFileInfo(const string &cache_filepath);
+
+	// Returns true if [filename] is an in-flight temporary cache file (a cache write in progress).
+	static bool IsTempCacheFile(const string &filename);
+
+	// Used to delete on-disk cache files, which returns the file prefix for the given [remote_file].
+	static string GetLocalCacheFilePrefix(const string &remote_file);
+
+	struct LocalCacheDestination {
+		// Local filepath.
+		string dest_local_filepath;
+		// Temporary local filepath (persisting local cache files are implemented by swapping temp files).
+		string temp_local_filepath;
+		// File attributes: always includes the original remote path; also includes the original cache filepath
+		// for oversized filepath/filename cases.
+		unordered_map<string, string> file_attrs;
+	};
+
+	// Resolve local cache destination, which handles oversized filepath and filename.
+	// [original_remote_path] is the source URL/path (e.g. "s3://bucket/file.parquet") and is always
+	// stored as a file attribute on the cache file.
+	static LocalCacheDestination ResolveLocalCacheDestination(const string &cache_directory,
+	                                                          const string &local_cache_file,
+	                                                          const string &original_remote_path);
+
+	// Read the original remote/source file path stored in the cache file's extended attributes.
+	// Returns empty string if the attribute is not present (e.g. cache files created before this feature).
+	static string TryGetOriginalRemotePath(const string &filepath);
+
+	// Store content to a local cache file using the pre-resolved [cache_dest].
+	// Disk space availability is validated, and eviction is triggered if needed.
+	// [lru_eviction_decider] is used to obtain the filepath to remove under LRU eviction policy.
+	static void StoreLocalCacheFile(const string &cache_directory, const LocalCacheDestination &cache_dest,
+	                                const PageAlignedDataChunk &content, const string &version_tag,
+	                                const InstanceConfig &config,
+	                                const std::function<optional<string>()> &lru_eviction_decider);
+
+	// Options for reading local cache files.
+	struct ReadOption {
+		// Whether to attempt direct I/O when conditions allow.
+		bool attempt_direct_io = false;
+	};
+	// Result of a local cache file read attempt.
+	struct LocalCacheReadResult {
+		bool cache_hit = false;
+		PageAlignedDataChunk content;
+	};
+
+	// Attempt to open, validate, and read a local cache file at the already-resolved [cache_filepath].
+	// If the local cache file doesn't match the requested [version_tag], it will be deleted.
+	// Uses direct I/O when [options.attempt_direct_io] is true and conditions allow (avoids double buffering).
+	static LocalCacheReadResult ReadLocalCacheFile(const string &cache_filepath, idx_t chunk_size,
+	                                               const string &version_tag, const ReadOption &options);
+
+	// Remove dead temporary cache files (write-to-temp-then-swap leftovers) under [cache_directories].
+	// Returns the number of files deleted.
+	// [db] and [mode] are optional; when [db] is nullptr the private thread pool is always used.
+	static idx_t CleanupDeadTempFiles(const vector<string> &cache_directories,
+	                                  optional_ptr<DatabaseInstance> db = nullptr,
+	                                  ParallelExecutorMode mode = ParallelExecutorMode::INTERNAL_THREAD_POOL);
+
+private:
+	// Return whether the cached file at [cache_filepath] is still valid for the given [version_tag].
+	// Empty version tag means cache validation is disabled.
+	static bool ValidateCacheFile(const string &cache_filepath, const string &version_tag);
+
+	// Attempt to evict cache files, if file size threshold reached.
+	// [lru_eviction_decider] is used to obtain the filepath to remove under LRU eviction policy.
+	static void EvictCacheFiles(FileSystem &local_filesystem, const string &cache_directory,
+	                            const string &eviction_policy,
+	                            const std::function<optional<string>()> &lru_eviction_decider);
+};
+
+} // namespace duckdb
