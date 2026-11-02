@@ -1,0 +1,90 @@
+# name: test/sql/disable_external_access.test
+# description: test that caching filesystem respects enable_external_access when serving from cache
+# group: [sql]
+
+require notwindows
+
+require cache_httpfs
+
+require parquet
+
+statement ok
+SELECT cache_httpfs_clear_cache();
+
+statement ok
+SET cache_httpfs_profile_type='temp';
+
+statement ok
+SET cache_httpfs_disk_cache_reader_enable_memory_cache=false;
+
+statement ok
+SET cache_httpfs_cache_directory='/tmp/duckdb_cache_httpfs_cache_1';
+
+# Disable the persistent (on-disk) secret storage. The sqllogic test runner auto-sets `secret_directory` to a path under `duckdb_unittest_tempdir/...`
+# that we cannot easily add to `allowed_directories` below. Since DuckDB v1.5.3 the secret manager reads `secret_directory` through the permissioned
+# `LocalDatabaseFileSystem`, so any read with httpfs loaded would trigger a secret lookup that hits the `enable_external_access` gate and fail before
+# the actual HTTP fetch. We are not testing secrets here, so disable the persistent backend up front.
+statement ok
+SET allow_persistent_secrets=false;
+
+# Cache directory isn't inclued in the allowed directory lists.
+statement ok
+SET allowed_directories=['https://raw.githubusercontent.com/', '/tmp/duckdb_cache_httpfs_cache'];
+
+statement ok
+SET enable_external_access = false;
+
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query II
+SELECT cache_hit_count, cache_miss_count FROM cache_httpfs_cache_access_info_query() WHERE cache_type = 'data';
+----
+0	2
+
+# =============================================
+# Restart the database to allow disk access.
+# =============================================
+restart
+
+statement ok
+SELECT cache_httpfs_clear_cache();
+
+statement ok
+SET cache_httpfs_profile_type='temp';
+
+statement ok
+SET cache_httpfs_disk_cache_reader_enable_memory_cache=false;
+
+# Switch cache directory to make it allowed.
+statement ok
+SET cache_httpfs_cache_directory='/tmp/duckdb_cache_httpfs_cache';
+
+# See comment above; `restart` resets this so we must re-apply it here too.
+statement ok
+SET allow_persistent_secrets=false;
+
+statement ok
+SET enable_external_access = false;
+
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query II
+SELECT cache_hit_count, cache_miss_count FROM cache_httpfs_cache_access_info_query() WHERE cache_type = 'data';
+----
+1	1

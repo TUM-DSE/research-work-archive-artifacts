@@ -1,0 +1,397 @@
+#include "disk_cache_util.hpp"
+
+#include <atomic>
+
+#include "duckdb/common/assert.hpp"
+#include "cache_filesystem_config.hpp"
+#include "crypto.hpp"
+#include "cache_httpfs_instance_state.hpp"
+#include "duckdb/common/file_system.hpp"
+#include "duckdb/common/local_file_system.hpp"
+#include "duckdb/common/string_util.hpp"
+#include "duckdb/common/types/timestamp.hpp"
+#include "duckdb/common/types/uuid.hpp"
+#include "scope_guard.hpp"
+#include "utils/include/filesystem_utils.hpp"
+#include "utils/include/hash_utils.hpp"
+#include "utils/include/page_aligned_data_chunk.hpp"
+#include "utils/include/parallel_executor.hpp"
+#include "utils/include/url_utils.hpp"
+
+namespace duckdb {
+
+namespace {
+
+// Get temporary cache filepath from the destination cache filepath.
+string GetTempCacheFilePath(const string &cache_filepath) {
+	// Dump to a unique temporary location at local filesystem, since there could be multiple processes writing cache
+	// file for the same remote file.
+	return StringUtil::Format("%s.%s.httpfs_local_cache", cache_filepath, UUID::ToString(UUID::GenerateRandomUUID()));
+}
+
+// Suffix for temporary cache files.
+constexpr const char *TEMP_CACHE_FILE_SUFFIX = ".httpfs_local_cache";
+
+// Staleness threshold for dead temp file cleanup: 10 minutes in microseconds.
+constexpr idx_t DEAD_TEMP_STALENESS_MICROSEC = 10 * 60 * 1000 * 1000;
+
+// xattr key prefix for storing chunked original cache filepath.
+// Zero-padded indices (e.g. .001, .002) ensure lexicographic sort matches chunk order.
+constexpr const char *CACHE_FILEPATH_ATTR_PREFIX = "user.cache_httpfs_cache_filepath";
+
+// xattr key prefix for storing chunked original remote/source file path.
+constexpr const char *REMOTE_PATH_ATTR_PREFIX = "user.cache_httpfs_remote_path";
+
+// Reconstruct a string value from chunked xattr entries with the given key prefix.
+// Returns empty string if no attributes are found.
+string ReadChunkedXattr(const string &filepath, const char *key_prefix) {
+	string result;
+	for (idx_t idx = 0;; ++idx) {
+		const string key = StringUtil::Format("%s.%03llu", key_prefix, idx);
+		string chunk = GetFileXattr(filepath, key);
+		if (chunk.empty()) {
+			break;
+		}
+		result += chunk;
+	}
+	return result;
+}
+
+// Try to reconstruct the original (non-shortened) local cache filepath from chunked xattr entries.
+// Returns empty string if no attributes are found (i.e. the filepath was never shortened).
+string TryGetOriginalCacheFilepath(const string &filepath) {
+	return ReadChunkedXattr(filepath, CACHE_FILEPATH_ATTR_PREFIX);
+}
+
+// Write a string value as chunked xattr entries into [file_attrs] with the given key prefix.
+void AddChunkedXattrEntries(unordered_map<string, string> &file_attrs, const char *key_prefix, const string &value) {
+	const idx_t max_xattr_val_size = GetMaxXattrValueSize();
+	const idx_t value_len = value.length();
+	const idx_t chunk_count = (value_len + max_xattr_val_size - 1) / max_xattr_val_size;
+	for (idx_t idx = 0; idx < chunk_count; ++idx) {
+		const idx_t offset = idx * max_xattr_val_size;
+		const idx_t len = MinValue(max_xattr_val_size, value_len - offset);
+		const string key = StringUtil::Format("%s.%03llu", key_prefix, idx);
+		file_attrs[key] = value.substr(offset, len);
+	}
+}
+
+idx_t GetCacheDirectoryIdx(const duckdb::hash_bytes &remote_file_sha256_val, idx_t cache_directory_count) {
+	uint64_t hash_value = 0xcbf29ce484222325; // FNV offset basis
+	for (idx_t idx = 0; idx < sizeof(remote_file_sha256_val); ++idx) {
+		hash_value ^= static_cast<uint64_t>(remote_file_sha256_val[idx]);
+		hash_value *= 0x100000001b3; // FNV prime
+	}
+	return hash_value % cache_directory_count;
+}
+
+void PopulateRemoteFileCacheKey(const string &remote_file, duckdb::hash_bytes &remote_file_sha256_val,
+                                string &remote_file_sha256_hex, string &sanitized_fname) {
+	static_assert(sizeof(remote_file_sha256_val) == 32);
+	duckdb::sha256(remote_file.data(), remote_file.length(), remote_file_sha256_val);
+	remote_file_sha256_hex = Sha256ToHexString(remote_file_sha256_val);
+	sanitized_fname = StringUtil::GetFileName(SanitizedCachePath(remote_file).Path());
+}
+
+} // namespace
+
+/*static*/ string DiskCacheUtil::TryGetOriginalRemotePath(const string &filepath) {
+	return ReadChunkedXattr(filepath, REMOTE_PATH_ATTR_PREFIX);
+}
+
+/*static*/ DiskCacheUtil::RemoteFileCachePathInfo
+DiskCacheUtil::BuildRemoteFileCachePathInfo(const vector<string> &cache_directories, const string &remote_file) {
+	ALWAYS_ASSERT(!cache_directories.empty());
+
+	RemoteFileCachePathInfo path_info;
+	duckdb::hash_bytes remote_file_sha256_val;
+	PopulateRemoteFileCacheKey(remote_file, remote_file_sha256_val, path_info.remote_file_sha256_hex,
+	                           path_info.sanitized_fname);
+	path_info.cache_directory_idx = GetCacheDirectoryIdx(remote_file_sha256_val, cache_directories.size());
+	path_info.cache_directory = cache_directories[path_info.cache_directory_idx];
+	if (StringUtil::EndsWith(path_info.cache_directory, "/")) {
+		throw InternalException("Cache directory %s cannot ends with '/'", path_info.cache_directory);
+	}
+	return path_info;
+}
+
+/*static*/ DiskCacheUtil::CacheFileDestination
+DiskCacheUtil::GetLocalCacheFile(const RemoteFileCachePathInfo &path_info, idx_t start_offset, idx_t bytes_to_read) {
+	auto cache_filepath =
+	    StringUtil::Format("%s/%s-%s-%llu-%llu", path_info.cache_directory, path_info.remote_file_sha256_hex,
+	                       path_info.sanitized_fname, start_offset, bytes_to_read);
+	return DiskCacheUtil::CacheFileDestination {
+	    .cache_directory_idx = path_info.cache_directory_idx,
+	    .cache_filepath = std::move(cache_filepath),
+	};
+}
+
+/*static*/ DiskCacheUtil::CacheFileDestination DiskCacheUtil::GetLocalCacheFile(const vector<string> &cache_directories,
+                                                                                const string &remote_file,
+                                                                                idx_t start_offset,
+                                                                                idx_t bytes_to_read) {
+	auto path_info = BuildRemoteFileCachePathInfo(cache_directories, remote_file);
+	return GetLocalCacheFile(path_info, start_offset, bytes_to_read);
+}
+
+/*static*/ DiskCacheUtil::RemoteFileInfo DiskCacheUtil::GetRemoteFileInfo(const string &cache_filepath) {
+	// The on-disk filename may have been shortened to a SHA256 hash when it exceeded platform limits. In that case the
+	// original full local cache filepath is stored in chunked xattr entries.  Recover it first so the split below works
+	// correctly.
+	string local_filename = StringUtil::GetFileName(cache_filepath);
+	const string original_filepath = TryGetOriginalCacheFilepath(cache_filepath);
+	if (!original_filepath.empty()) {
+		local_filename = StringUtil::GetFileName(original_filepath);
+	}
+
+	// [local_filename] is formatted as <hash>-<remote-fname>-<start-offset>-<block-size>
+	vector<string> tokens = StringUtil::Split(local_filename, "-");
+	ALWAYS_ASSERT(tokens.size() >= 4);
+
+	// Get tokens for remote paths.
+	vector<string> remote_path_tokens;
+	remote_path_tokens.reserve(tokens.size() - 3);
+
+	for (idx_t idx = 1; idx < tokens.size() - 2; ++idx) {
+		remote_path_tokens.emplace_back(std::move(tokens[idx]));
+	}
+
+	const string &start_offset_str = tokens[tokens.size() - 2];
+	const string &block_size_str = tokens[tokens.size() - 1];
+	const idx_t start_offset = StringUtil::ToUnsigned(start_offset_str);
+	const idx_t block_size = StringUtil::ToUnsigned(block_size_str);
+
+	return RemoteFileInfo {
+	    .remote_filename = StringUtil::Join(remote_path_tokens, "/"),
+	    .start_offset = start_offset,
+	    .end_offset = start_offset + block_size,
+	};
+}
+
+/*static*/ bool DiskCacheUtil::IsTempCacheFile(const string &filename) {
+	return StringUtil::EndsWith(filename, TEMP_CACHE_FILE_SUFFIX);
+}
+
+/*static*/ string DiskCacheUtil::GetLocalCacheFilePrefix(const string &remote_file) {
+	duckdb::hash_bytes remote_file_sha256_val;
+	string remote_file_sha256_hex;
+	string sanitized_fname;
+	PopulateRemoteFileCacheKey(remote_file, remote_file_sha256_val, remote_file_sha256_hex, sanitized_fname);
+	return StringUtil::Format("%s-%s", remote_file_sha256_hex, sanitized_fname);
+}
+
+/*static*/ void DiskCacheUtil::EvictCacheFiles(FileSystem &local_filesystem, const string &cache_directory,
+                                               const string &eviction_policy,
+                                               const std::function<optional<string>()> &lru_eviction_decider) {
+	// After cache file eviction and file deletion request we cannot perform a cache dump operation immediately,
+	// because on unix platform files are only deleted physically when their last reference count goes away.
+	//
+	// For timestamp-based eviction, we simply return all the files which reaches certain threshold.
+	if (eviction_policy == *ON_DISK_CREATION_TIMESTAMP_EVICTION) {
+		EvictStaleCacheFiles(local_filesystem, cache_directory);
+		return;
+	}
+
+	// For LRU-based eviction, get the entry to remove and delete the file to release storage space.
+	ALWAYS_ASSERT(eviction_policy == *ON_DISK_LRU_SINGLE_PROC_EVICTION);
+	const auto filepath_to_evict = lru_eviction_decider();
+	if (!filepath_to_evict) {
+		return;
+	}
+	// Intentionally ignore return value.
+	local_filesystem.TryRemoveFile(*filepath_to_evict);
+}
+
+/*static*/ void DiskCacheUtil::StoreLocalCacheFile(const string &cache_directory,
+                                                   const LocalCacheDestination &cache_dest,
+                                                   const PageAlignedDataChunk &content, const string &version_tag,
+                                                   const InstanceConfig &config,
+                                                   const std::function<optional<string>()> &lru_eviction_decider) {
+	LocalFileSystem local_filesystem {};
+
+	// Skip local cache if insufficient disk space.
+	// It's worth noting it's not a strict check since there could be concurrent check and write operation (RMW
+	// operation), but it's acceptable since min available disk space reservation is an order of magnitude bigger than
+	// cache chunk size.
+	if (!CanCacheOnDisk(cache_directory, config.cache_block_size, config.min_disk_bytes_for_cache)) {
+		EvictCacheFiles(local_filesystem, cache_directory, config.on_disk_eviction_policy, lru_eviction_decider);
+		return;
+	}
+
+	// Temporary file is removed after write completion whatever.
+	SCOPE_EXIT {
+		local_filesystem.TryRemoveFile(cache_dest.temp_local_filepath);
+	};
+
+	// Dump to a unique temporary location at local filesystem, since there could be multiple processes writing cache
+	// file for the same remote file.
+	{
+		auto file_open_flags = FileOpenFlags::FILE_FLAGS_WRITE | FileOpenFlags::FILE_FLAGS_FILE_CREATE_NEW;
+		// When we enable write-through/read-through cache for disk cache reader, use direct IO to avoid double caching.
+		// Notice direct IO requires IO size to be aligned with page size.
+		if (config.enable_disk_reader_mem_cache && content.length % GetFileSystemPageSize() == 0) {
+			file_open_flags |= FileOpenFlags::FILE_FLAGS_DIRECT_IO;
+		}
+		auto file_handle = local_filesystem.OpenFile(cache_dest.temp_local_filepath, file_open_flags);
+		local_filesystem.Write(*file_handle, const_cast<void *>(static_cast<const void *>(content.data())),
+		                       /*nr_bytes=*/content.length,
+		                       /*location=*/0);
+		file_handle->Sync();
+	}
+
+	// Store validation metadata before publishing the cache file. Otherwise a concurrent reader can observe the moved
+	// file before xattrs are attached and invalidate it as a mismatched cache entry.
+	if (!version_tag.empty() && !SetCacheVersion(cache_dest.temp_local_filepath, version_tag)) {
+		return;
+	}
+	if (!cache_dest.file_attrs.empty() && !SetFileXattrs(cache_dest.temp_local_filepath, cache_dest.file_attrs)) {
+		return;
+	}
+
+	// Then atomically move to the target postion to prevent data corruption due to concurrent write.
+	//
+	// TODO(hjiang): Provide a way to cleanup temporary files.
+	// Issue reference: https://github.com/dentiny/duck-read-cache-fs/issues/422
+	local_filesystem.MoveFile(/*source=*/cache_dest.temp_local_filepath,
+	                          /*target=*/cache_dest.dest_local_filepath);
+}
+
+/*static*/ DiskCacheUtil::LocalCacheReadResult DiskCacheUtil::ReadLocalCacheFile(const string &cache_filepath,
+                                                                                 idx_t chunk_size,
+                                                                                 const string &version_tag,
+                                                                                 const ReadOption &options) {
+	auto file_open_flags = FileOpenFlags::FILE_FLAGS_READ | FileOpenFlags::FILE_FLAGS_NULL_IF_NOT_EXISTS;
+
+	// Enable direct IO when requested and size is page-aligned.
+	// PageAlignedDataChunk guarantees the buffer address and capacity are page-aligned.
+	const idx_t page_size = GetFileSystemPageSize();
+	if (options.attempt_direct_io && chunk_size % page_size == 0) {
+		file_open_flags |= FileOpenFlags::FILE_FLAGS_DIRECT_IO;
+	}
+
+	LocalFileSystem local_filesystem {};
+	// On all platform, DuckDB opens option guarantee reference counting, which means even if the file is requested to
+	// delete, already-opened file handle could still be accessed with no problem.
+	// Reference: https://github.com/duckdb/duckdb/pull/19782
+	auto file_handle = local_filesystem.OpenFile(cache_filepath, file_open_flags);
+
+	// Check cache validity and clear if necessary.
+	if (file_handle != nullptr && !ValidateCacheFile(cache_filepath, version_tag)) {
+		local_filesystem.TryRemoveFile(cache_filepath);
+		file_handle = nullptr;
+	}
+
+	if (file_handle == nullptr) {
+		return LocalCacheReadResult {};
+	}
+
+	auto content = AllocatePageAlignedChunk(chunk_size);
+	local_filesystem.Read(*file_handle, content.data(), chunk_size, /*location=*/0);
+	content.length = chunk_size;
+
+	// Update access and modification timestamp for the cache file, so it won't get evicted.
+	// Intentionally ignore the return value, since it's possible the cache file has been requested to
+	// delete by another eviction thread.
+	UpdateFileTimestamps(cache_filepath);
+
+	return LocalCacheReadResult {
+	    .cache_hit = true,
+	    .content = std::move(content),
+	};
+}
+
+/*static*/ bool DiskCacheUtil::ValidateCacheFile(const string &cache_filepath, const string &version_tag) {
+	// Empty version tags means cache validation is disabled.
+	if (version_tag.empty()) {
+		return true;
+	}
+	const string cached_version_tag = GetCacheVersion(cache_filepath);
+	// If cached version tag is empty, the file might have been created before validation was enabled.
+	// In this case, we should treat it as invalid to be safe.
+	if (cached_version_tag.empty()) {
+		return false;
+	}
+	return cached_version_tag == version_tag;
+}
+
+/*static*/ DiskCacheUtil::LocalCacheDestination
+DiskCacheUtil::ResolveLocalCacheDestination(const string &cache_directory, const string &local_cache_file,
+                                            const string &original_remote_path) {
+	if (StringUtil::EndsWith(cache_directory, "/")) {
+		throw InvalidInputException("Cache directory %s cannot ends with '/'", cache_directory);
+	}
+
+	const auto filepath_limit = GetMaxFileNameLength();
+	auto local_temp_filepath = GetTempCacheFilePath(local_cache_file);
+	auto local_temp_filename = StringUtil::GetFileName(local_temp_filepath);
+
+	LocalCacheDestination local_cache_dest;
+
+	// If there's no oversized filepath or filename, no special handling for the destination path.
+	if (local_temp_filename.length() <= filepath_limit.max_filename_len &&
+	    local_temp_filepath.length() <= filepath_limit.max_filepath_len) {
+		local_cache_dest.dest_local_filepath = local_cache_file;
+		local_cache_dest.temp_local_filepath = std::move(local_temp_filepath);
+	} else {
+		// Otherwise, special handle oversized filepath and filename: use the hash value as filename.
+		auto local_cache_filepath_sha256 = GetSha256(local_cache_file);
+		local_cache_dest.dest_local_filepath =
+		    StringUtil::Format("%s/%s", cache_directory, local_cache_filepath_sha256);
+		local_cache_dest.temp_local_filepath = GetTempCacheFilePath(local_cache_dest.dest_local_filepath);
+
+		// Store the original cache filepath in file attributes as chunked entries, since xattr values have
+		// platform-specific size limits.
+		AddChunkedXattrEntries(local_cache_dest.file_attrs, CACHE_FILEPATH_ATTR_PREFIX, local_cache_file);
+	}
+
+	// Always store the original remote/source file path so it can be read back when querying cache contents.
+	if (!original_remote_path.empty()) {
+		AddChunkedXattrEntries(local_cache_dest.file_attrs, REMOTE_PATH_ATTR_PREFIX, original_remote_path);
+	}
+
+	return local_cache_dest;
+}
+
+/*static*/ idx_t DiskCacheUtil::CleanupDeadTempFiles(const vector<string> &cache_directories,
+                                                     optional_ptr<DatabaseInstance> db, ParallelExecutorMode mode) {
+	LocalFileSystem local_filesystem {};
+	vector<string> temp_file_paths;
+
+	for (const auto &cache_directory : cache_directories) {
+		local_filesystem.ListFiles(
+		    cache_directory, [&temp_file_paths, &cache_directory](const string &fname, bool /*unused*/) {
+			    if (!IsTempCacheFile(fname)) {
+				    return;
+			    }
+			    temp_file_paths.emplace_back(StringUtil::Format("%s/%s", cache_directory, fname));
+		    });
+	}
+
+	if (temp_file_paths.empty()) {
+		return 0;
+	}
+
+	const timestamp_t now = Timestamp::GetCurrentTimestamp();
+	const size_t thread_num = temp_file_paths.size();
+	std::atomic<idx_t> deleted_count {0};
+	auto executor = CreateParallelExecutor(db, mode, thread_num);
+	for (auto &path : temp_file_paths) {
+		executor->Schedule([path = std::move(path), now, &deleted_count]() {
+			LocalFileSystem fs;
+			auto file_handle =
+			    fs.OpenFile(path, FileOpenFlags::FILE_FLAGS_READ | FileOpenFlags::FILE_FLAGS_NULL_IF_NOT_EXISTS);
+			if (file_handle == nullptr) {
+				return;
+			}
+			const timestamp_t last_mod_time = fs.GetLastModifiedTime(*file_handle);
+			const int64_t diff_microsec = now.value - last_mod_time.value;
+			if (diff_microsec >= static_cast<int64_t>(DEAD_TEMP_STALENESS_MICROSEC) && fs.TryRemoveFile(path)) {
+				deleted_count.fetch_add(1);
+			}
+		});
+	}
+	executor->WaitAll();
+	return deleted_count;
+}
+
+} // namespace duckdb

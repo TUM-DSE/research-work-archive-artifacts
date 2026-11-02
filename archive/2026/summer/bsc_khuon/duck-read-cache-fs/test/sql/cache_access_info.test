@@ -1,0 +1,102 @@
+# name: test/sql/cache_access_info.test
+# description: test cache access info
+# group: [sql]
+
+# Notice: we don't really test glob cache operation, because HTTP filesystem doesn't support real GLOB.
+
+require cache_httpfs
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	0	0	0	NULL	NULL	NULL	NULL
+data	0	0	0	NULL	NULL	NULL	NULL
+file handle	0	0	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL
+
+# Start to record profile.
+statement ok
+SET cache_httpfs_profile_type='temp';
+
+# Test uncached query.
+statement ok
+SELECT cache_httpfs_clear_cache();
+
+query IIIII
+SELECT * FROM cache_httpfs_cache_status_query();
+----
+
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	2	1	0	NULL	NULL	NULL	NULL
+data	0	1	0	16222	16222	0	16222
+file handle	0	1	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL
+
+# Query second time should show cache hit.
+query I
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+----
+251
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	5	1	0	NULL	NULL	NULL	NULL
+data	1	1	0	32444	32444	16222	16222
+file handle	1	1	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL
+
+statement ok
+SELECT cache_httpfs_clear_profile();
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	0	0	0	NULL	NULL	NULL	NULL
+data	0	0	0	0	0	0	0
+file handle	0	0	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL
+
+# Disable all non data cache fron now on.
+statement ok
+SET cache_httpfs_enable_metadata_cache=false;
+
+statement ok
+SET cache_httpfs_enable_glob_cache=false;
+
+statement ok
+SET cache_httpfs_enable_file_handle_cache=false;
+
+statement ok
+SET cache_httpfs_type='noop';
+
+# After disabling cache, uncached read first time.
+statement ok
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	0	0	0	NULL	NULL	NULL	NULL
+data	0	0	0	0	0	0	0
+file handle	0	0	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL
+
+# After disabling cache, uncached read second time.
+statement ok
+SELECT COUNT(*) FROM read_csv_auto('https://raw.githubusercontent.com/dentiny/duck-read-cache-fs/refs/heads/main/test/data/stock-exchanges.csv');
+
+query IIIIIIII
+SELECT * FROM cache_httpfs_cache_access_info_query();
+----
+metadata	0	0	0	NULL	NULL	NULL	NULL
+data	0	0	0	0	0	0	0
+file handle	0	0	0	NULL	NULL	NULL	NULL
+glob	0	0	0	NULL	NULL	NULL	NULL

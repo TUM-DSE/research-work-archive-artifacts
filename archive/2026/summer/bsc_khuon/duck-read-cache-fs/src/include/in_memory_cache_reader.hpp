@@ -1,0 +1,54 @@
+// A filesystem wrapper, which performs in-memory cache for read operations.
+
+#pragma once
+
+#include "base_cache_reader.hpp"
+#include "cache_filesystem_config.hpp"
+#include "cache_read_chunk.hpp"
+#include "duckdb/common/shared_ptr.hpp"
+#include "duckdb/common/string.hpp"
+#include "duckdb/common/unique_ptr.hpp"
+#include "in_mem_cache_block.hpp"
+#include "in_mem_cache_data_entry.hpp"
+#include "in_memory_data_cache_storage.hpp"
+#include "mutex.hpp"
+#include "policy_data_cache_storage.hpp"
+
+namespace duckdb {
+
+// Forward declarations.
+struct CacheHttpfsInstanceState;
+
+class InMemoryCacheReader final : public BaseCacheReader {
+public:
+	// Constructor: config values are read from instance state at runtime (with defaults as fallback).
+	explicit InMemoryCacheReader(weak_ptr<CacheHttpfsInstanceState> instance_state_p)
+	    : BaseCacheReader(std::move(instance_state_p)) {
+	}
+	~InMemoryCacheReader() override = default;
+
+	string GetName() const override {
+		return *IN_MEM_CACHE_READER_NAME;
+	}
+
+	void ClearCache() override;
+	void ClearCache(const string &fname) override;
+	void ReadAndCache(FileHandle &handle, char *buffer, uint64_t requested_start_offset,
+	                  uint64_t requested_bytes_to_read, uint64_t file_size) override;
+	vector<DataCacheEntryInfo> GetCacheEntriesInfo() const override;
+	void RemapInMemoryDataBlocksForNewBlockSize(idx_t new_block_size) override;
+
+	// Per-group counters, empty unless the 'policy' storage backend is in use.
+	vector<PolicyGroupStats> GetPolicyStats() const;
+
+private:
+	// Process a single cache read chunk in a worker thread.
+	void ProcessCacheReadChunk(FileHandle &handle, const string &version_tag, CacheReadChunk cache_read_chunk);
+
+	// Once flag to guard against cache's initialization.
+	std::once_flag cache_init_flag;
+	// In-memory cache to store blocks; late initialized after first access.
+	shared_ptr<InMemoryDataCacheStorage> storage;
+};
+
+} // namespace duckdb

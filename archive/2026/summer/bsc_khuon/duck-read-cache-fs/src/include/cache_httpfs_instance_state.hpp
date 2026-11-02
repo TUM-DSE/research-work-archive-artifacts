@@ -1,0 +1,272 @@
+// Per-instance state for cache_httpfs extension.
+// State is stored in DuckDB's ObjectCache for automatic cleanup when DatabaseInstance is destroyed.
+
+#pragma once
+
+#include "base_cache_reader.hpp"
+#include "base_profile_collector.hpp"
+#include "cache_exclusion_manager.hpp"
+#include "cache_filesystem_config.hpp"
+#include "duckdb/common/shared_ptr.hpp"
+#include "duckdb/common/string.hpp"
+#include "duckdb/common/typedefs.hpp"
+#include "duckdb/common/unique_ptr.hpp"
+#include "duckdb/common/unordered_map.hpp"
+#include "duckdb/common/unordered_set.hpp"
+#include "duckdb/common/optional_ptr.hpp"
+#include "duckdb/common/vector.hpp"
+#include "duckdb/main/config.hpp"
+#include "duckdb/storage/object_cache.hpp"
+#include "filesystem_utils.hpp"
+#include "thread_annotation.hpp"
+
+namespace duckdb {
+
+// Forward declarations
+class BaseProfileCollector;
+class CacheFileSystem;
+class ClientContext;
+class DatabaseInstance;
+class FileOpener;
+struct CacheHttpfsInstanceState;
+
+//===--------------------------------------------------------------------===//
+// Per-instance filesystem registry
+//===--------------------------------------------------------------------===//
+class InstanceCacheFsRegistry {
+public:
+	// Register `fs` in the registry. Registering the same CacheFileSystem for multiple time is harmless but useless.
+	void Register(CacheFileSystem *fs);
+	// Unregister `fs` from the registry. Unregistering a CacheFileSystem that is not registered doesn't have any
+	// effect.
+	void Unregister(CacheFileSystem *fs);
+	unordered_set<CacheFileSystem *> GetAllCacheFs() const;
+	void Reset();
+
+private:
+	mutable concurrency::mutex mutex;
+	unordered_set<CacheFileSystem *> cache_filesystems DUCKDB_GUARDED_BY(mutex);
+};
+
+//===--------------------------------------------------------------------===//
+// Per-connection profile collector manager
+//===--------------------------------------------------------------------===//
+
+// Forward declaration
+struct InstanceConfig;
+
+// Manages per-connection profile collectors.
+// Each connection has its own profiler so stats can be tracked independently.
+class InstanceProfileCollectorManager {
+public:
+	// Sets the BaseProfileCollector for the given connection.
+	// If the collector already exists and the profile type is the same, the function does nothing, otherwise it creates
+	// a new collector and replaces the existing one.
+	void SetProfileCollector(connection_t connection_id, const string &profile_type);
+	// Returns the profile collector for the given connection.
+	// If no collector exists for the connection, returns a default noop collector.
+	BaseProfileCollector &GetProfileCollectorOrDefault(connection_t connection_id) const;
+	// Returns the profile collector for the given connection.
+	// If no collector exists for the connection, throws an exception.
+	BaseProfileCollector &GetProfileCollectorOrThrow(connection_t connection_id) const;
+	// Returns true if a profile collector was explicitly set for this connection.
+	bool HasExplicitProfileCollector(connection_t connection_id) const;
+	// Resets the profile collector for the given connection.
+	void ResetProfileCollector(connection_t connection_id);
+	// Removes the profile collector for the given connection.
+	void RemoveProfileCollector(connection_t connection_id);
+	// Returns the number of registered profile collectors, expose for testing and debugging purposes.
+	idx_t GetProfileCollectorCount() const;
+
+private:
+	mutable concurrency::mutex mutex;
+	unordered_map<connection_t, unique_ptr<BaseProfileCollector>> profile_collectors DUCKDB_GUARDED_BY(mutex);
+	mutable unique_ptr<BaseProfileCollector> default_noop_collector DUCKDB_GUARDED_BY(mutex);
+};
+
+//===--------------------------------------------------------------------===//
+// Per-instance cache reader manager
+//===--------------------------------------------------------------------===//
+
+class InstanceCacheReaderManager {
+public:
+	void SetCacheReader(const InstanceConfig &config, weak_ptr<CacheHttpfsInstanceState> instance_state_p);
+	BaseCacheReader *GetCacheReader() const;
+	vector<BaseCacheReader *> GetCacheReaders() const;
+	void InitializeDiskCacheReader(const vector<string> &cache_directories,
+	                               weak_ptr<CacheHttpfsInstanceState> instance_state_p);
+	void ClearCache();
+	void ClearCache(const string &fname);
+	void RemapInMemoryDataCachesAfterBlockSizeChange(idx_t new_block_size);
+	void Reset();
+
+private:
+	mutable concurrency::mutex mutex;
+	unique_ptr<BaseCacheReader> noop_cache_reader DUCKDB_GUARDED_BY(mutex);
+	unique_ptr<BaseCacheReader> in_mem_cache_reader DUCKDB_GUARDED_BY(mutex);
+	unique_ptr<BaseCacheReader> on_disk_cache_reader DUCKDB_GUARDED_BY(mutex);
+	BaseCacheReader *internal_cache_reader DUCKDB_GUARDED_BY(mutex) = nullptr;
+};
+
+//===--------------------------------------------------------------------===//
+// Per-instance configuration
+//===--------------------------------------------------------------------===//
+struct InstanceConfig {
+	// General config
+	idx_t cache_block_size = DEFAULT_CACHE_BLOCK_SIZE;
+	string cache_type = *DEFAULT_CACHE_TYPE;
+	string profile_type = *DEFAULT_PROFILE_TYPE;
+	uint64_t max_subrequest_count = DEFAULT_MAX_SUBREQUEST_COUNT;
+	bool ignore_sigpipe = DEFAULT_IGNORE_SIGPIPE;
+
+	// On-disk cache config
+	vector<string> on_disk_cache_directories = {GetDefaultOnDiskCacheDirectory()};
+	idx_t min_disk_bytes_for_cache = DEFAULT_MIN_DISK_BYTES_FOR_CACHE;
+	string on_disk_eviction_policy = *DEFAULT_ON_DISK_EVICTION_POLICY;
+
+	// Disk reader in-memory cache config
+	bool enable_disk_reader_mem_cache = DEFAULT_ENABLE_DISK_READER_MEM_CACHE;
+	idx_t disk_reader_max_mem_cache_block_count = DEFAULT_MAX_DISK_READER_MEM_CACHE_BLOCK_COUNT;
+	idx_t disk_reader_max_mem_cache_timeout_millisec = DEFAULT_DISK_READER_MEM_CACHE_TIMEOUT_MILLISEC;
+
+	// In-memory cache config
+	idx_t max_in_mem_cache_block_count = DEFAULT_MAX_IN_MEM_CACHE_BLOCK_COUNT;
+	idx_t in_mem_cache_block_timeout_millisec = DEFAULT_IN_MEM_BLOCK_CACHE_TIMEOUT_MILLISEC;
+	// Storage backend used by both `InMemoryCacheReader` and `DiskCacheReader`'s in-mem layer.
+	string in_mem_cache_storage = *DEFAULT_IN_MEM_CACHE_STORAGE;
+
+	// --- uCache simulation ---------------------------------------------------
+	// Two independent axes, so a run can hold one fixed while moving the other.
+	//
+	// Axis 1, cache entry granularity: 'fixed' keeps the stock block grid;
+	// 'column_chunk' makes each entry one Parquet column chunk, for files whose
+	// layout has been registered.
+	string chunking = *DEFAULT_CHUNKING;
+
+	// Axis 2, replacement. Only consulted by the 'policy' storage backend,
+	// which is bounded by BYTES rather than entry count because column chunks
+	// are variable-sized.
+	//
+	// [in_mem_cache_bytes] is the TOTAL budget across every group. Hold it
+	// equal across configurations and the comparison is memory-fair whatever
+	// the partitioning.
+	idx_t in_mem_cache_bytes = DEFAULT_IN_MEM_CACHE_BYTES;
+	string eviction_policy = *DEFAULT_EVICTION_POLICY;
+	// 'global' = one policy instance and one budget for everything;
+	// 'per_file' = honour [file_policies], giving each matched file its own
+	// policy instance AND its own slice of the budget.
+	string policy_scope = *DEFAULT_POLICY_SCOPE;
+	// ';'-separated `pattern=policy[:size]`. [pattern] matches as a substring of
+	// the path; [size] is a byte count or a percentage of [in_mem_cache_bytes].
+	// Groups with no size share whatever the sized ones leave, the catch-all
+	// group included. So all three of these are expressible:
+	//   'lineitem=fifo;orders=clock'              -> equal thirds
+	//   'lineitem=fifo:75%;orders=clock:15%'      -> explicit split, 10% left over
+	//   'lineitem=mru:8000000000'                 -> absolute bytes for one file
+	string file_policies;
+
+	// --- remote simulation ---------------------------------------------------
+	// Charge every cache miss what an object-store GET would cost, so local
+	// Parquet files can stand in for remote ones:
+	//     delay_us = sim_latency_us + bytes / (sim_bandwidth_gbps * 1000)
+	// Both 0 (the default) means no simulation. Applies to every cache type,
+	// including 'noop', so the no-caching baseline pays the same miss cost.
+	idx_t sim_latency_us = DEFAULT_SIM_LATENCY_US;
+	double sim_bandwidth_gbps = DEFAULT_SIM_BANDWIDTH_GBPS;
+
+	// Metadata cache config
+	bool enable_metadata_cache = DEFAULT_ENABLE_METADATA_CACHE;
+	idx_t max_metadata_cache_entry = DEFAULT_MAX_METADATA_CACHE_ENTRY;
+	idx_t metadata_cache_entry_timeout_millisec = DEFAULT_METADATA_CACHE_ENTRY_TIMEOUT_MILLISEC;
+
+	// File handle cache config
+	bool enable_file_handle_cache = DEFAULT_ENABLE_FILE_HANDLE_CACHE;
+	idx_t max_file_handle_cache_entry = DEFAULT_MAX_FILE_HANDLE_CACHE_ENTRY;
+	idx_t file_handle_cache_entry_timeout_millisec = DEFAULT_FILE_HANDLE_CACHE_ENTRY_TIMEOUT_MILLISEC;
+
+	// Glob cache config
+	bool enable_glob_cache = DEFAULT_ENABLE_GLOB_CACHE;
+	idx_t max_glob_cache_entry = DEFAULT_MAX_GLOB_CACHE_ENTRY;
+	idx_t glob_cache_entry_timeout_millisec = DEFAULT_GLOB_CACHE_ENTRY_TIMEOUT_MILLISEC;
+
+	// Cache validation config
+	bool enable_cache_validation = DEFAULT_ENABLE_CACHE_VALIDATION;
+
+	// Cache invalidation on write config
+	bool clear_cache_on_write = DEFAULT_CLEAR_CACHE_ON_WRITE;
+
+	// Parallel read executor mode: "internal_thread_pool" or "duckdb_task_scheduler".
+	ParallelExecutorMode parallel_read_mode = ParallelExecutorMode::INTERNAL_THREAD_POOL;
+};
+
+//===--------------------------------------------------------------------===//
+// Main per-instance state container
+// Inherits from ObjectCacheEntry for automatic cleanup when DatabaseInstance is destroyed
+//===--------------------------------------------------------------------===//
+struct CacheHttpfsInstanceState : public ObjectCacheEntry {
+	static constexpr const char *OBJECT_TYPE = "CacheHttpfsInstanceState";
+	static constexpr const char *CACHE_KEY = "cache_httpfs_instance_state";
+
+	// Extension config for the current duckdb instance.
+	InstanceConfig config;
+	// Database instance; instance state is the stored in object cache (which is part of db instance), so data member is
+	// guanranteed valid.
+	optional_ptr<DatabaseInstance> db_instance;
+	// Cache filesystem registry.
+	InstanceCacheFsRegistry registry;
+	InstanceCacheReaderManager cache_reader_manager;
+	InstanceProfileCollectorManager profile_collector_manager;
+	CacheExclusionManager exclusion_manager;
+
+	CacheHttpfsInstanceState() = default;
+	~CacheHttpfsInstanceState() override;
+
+	// ObjectCacheEntry interface
+	string GetObjectType() override {
+		return OBJECT_TYPE;
+	}
+
+	static string ObjectType() {
+		return OBJECT_TYPE;
+	}
+
+	optional_idx GetEstimatedCacheMemory() const override {
+		return optional_idx {};
+	}
+
+	// Get profile collector reference
+	BaseProfileCollector &GetProfileCollector();
+	// Reset profile collector.
+	void ResetProfileCollector();
+	// Set the profile collector.
+	void SetProfileCollector(string profile_type);
+	// Return if the path is allowed by current DB config.
+	bool CanAccessFile(const string &path);
+};
+
+//===--------------------------------------------------------------------===//
+// Helper functions to access instance state
+//===--------------------------------------------------------------------===//
+
+// Store instance state in DatabaseInstance
+void SetInstanceState(DatabaseInstance &instance, shared_ptr<CacheHttpfsInstanceState> state);
+
+// Get instance state as shared_ptr from DatabaseInstance (returns nullptr if not set)
+shared_ptr<CacheHttpfsInstanceState> GetInstanceStateShared(DatabaseInstance &instance);
+
+// Get instance state, throwing if not found
+CacheHttpfsInstanceState &GetInstanceStateOrThrow(DatabaseInstance &instance);
+
+// Get instance state from ClientContext, throwing if not found
+CacheHttpfsInstanceState &GetInstanceStateOrThrow(ClientContext &context);
+
+// Get instance state as shared_ptr, throw exception if already unreferenced.
+shared_ptr<CacheHttpfsInstanceState> GetInstanceConfigOrThrow(const weak_ptr<CacheHttpfsInstanceState> &instance_state);
+
+// Get the per-connection profile collector, throwing if no collector exists for the given
+// connection. Use this in filesystem and cache reader code where a valid collector is
+// always expected (InitializeGlobalConfig guarantees it).
+BaseProfileCollector &GetProfileCollectorOrThrow(const shared_ptr<CacheHttpfsInstanceState> &instance_state,
+                                                 connection_t conn_id);
+
+} // namespace duckdb
